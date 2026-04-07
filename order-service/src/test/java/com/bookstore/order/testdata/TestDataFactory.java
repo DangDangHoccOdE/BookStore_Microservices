@@ -1,21 +1,22 @@
 package com.bookstore.order.testdata;
 
+import static org.instancio.Select.field;
+
 import com.bookstore.order.domain.models.Address;
 import com.bookstore.order.domain.models.CreatedOrderRequest;
 import com.bookstore.order.domain.models.Customer;
 import com.bookstore.order.domain.models.OrderItem;
-import org.instancio.Instancio;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
-
-import static org.instancio.Select.field;
+import org.instancio.Instancio;
 
 public class TestDataFactory {
     static final List<String> VALID_COUNTIES = List.of("India", "Germany", "VN");
-    static final Set<OrderItem> VALID_ORDER_ITEMS = Set.of(new OrderItem("P100", "Product 1", new BigDecimal("25.50"), 1));
-    static final Set<OrderItem> INVALID_ORDER_ITEMS = Set.of(new OrderItem("ABCD", "Product 1", new BigDecimal("25.50"), 1));
+    static final Set<OrderItem> VALID_ORDER_ITEMS =
+            Set.of(new OrderItem("P100", "Product 1", new BigDecimal("25.50"), 1));
+    static final Set<OrderItem> INVALID_ORDER_ITEMS =
+            Set.of(new OrderItem("ABCD", "Product 1", new BigDecimal("25.50"), 1));
 
     public static CreatedOrderRequest createValidOrderRequest() {
         return Instancio.of(CreatedOrderRequest.class)

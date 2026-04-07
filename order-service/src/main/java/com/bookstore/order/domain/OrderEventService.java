@@ -3,13 +3,12 @@ package com.bookstore.order.domain;
 import com.bookstore.order.domain.models.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -74,7 +73,7 @@ public class OrderEventService {
         List<OrderEventEntity> events = orderEventRepository.findAll(sort);
         log.info("Found {} Order Events to be published", events.size());
 
-        for (OrderEventEntity event: events) {
+        for (OrderEventEntity event : events) {
             this.publishEvent(event);
             orderEventRepository.delete(event);
         }
@@ -83,19 +82,21 @@ public class OrderEventService {
     private void publishEvent(OrderEventEntity orderEvent) {
         OrderEventType orderEventType = orderEvent.getEventType();
         switch (orderEventType) {
-            case ORDER_CREATED :
+            case ORDER_CREATED:
                 OrderCreatedEvent orderCreatedEvent = fromJsonPayload(orderEvent.getPayload(), OrderCreatedEvent.class);
                 orderEventPublisher.publish(orderCreatedEvent);
                 break;
-            case ORDER_DELIVERED :
-                OrderDeliveredEvent orderDeliveredEvent = fromJsonPayload(orderEvent.getPayload(), OrderDeliveredEvent.class);
+            case ORDER_DELIVERED:
+                OrderDeliveredEvent orderDeliveredEvent =
+                        fromJsonPayload(orderEvent.getPayload(), OrderDeliveredEvent.class);
                 orderEventPublisher.publish(orderDeliveredEvent);
                 break;
-            case ORDER_CANCELLED :
-                OrderCancelledEvent orderCancelledEvent = fromJsonPayload(orderEvent.getPayload(), OrderCancelledEvent.class);
+            case ORDER_CANCELLED:
+                OrderCancelledEvent orderCancelledEvent =
+                        fromJsonPayload(orderEvent.getPayload(), OrderCancelledEvent.class);
                 orderEventPublisher.publish(orderCancelledEvent);
                 break;
-            case ORDER_PROCESSING_FAILED :
+            case ORDER_PROCESSING_FAILED:
                 OrderErrorEvent orderErrorEvent = fromJsonPayload(orderEvent.getPayload(), OrderErrorEvent.class);
                 orderEventPublisher.publish(orderErrorEvent);
                 break;

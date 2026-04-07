@@ -1,7 +1,6 @@
 package com.bookstore.order.domain;
 
 import com.bookstore.order.domain.models.*;
-
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -16,8 +15,7 @@ public class OrderEventMapper {
                 getOrderItems(order),
                 order.getCustomer(),
                 order.getDeliveryAddress(),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
     }
 
     static OrderDeliveredEvent buildOrderDeliveredEvent(OrderEntity entity) {
@@ -27,8 +25,7 @@ public class OrderEventMapper {
                 getOrderItems(entity),
                 entity.getCustomer(),
                 entity.getDeliveryAddress(),
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
     }
 
     static OrderCancelledEvent buildOrderCancelledEvent(OrderEntity order, String reason) {
@@ -39,11 +36,10 @@ public class OrderEventMapper {
                 order.getCustomer(),
                 order.getDeliveryAddress(),
                 reason,
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
     }
 
-    static OrderErrorEvent  buildOrderErrorEvent(OrderEntity order, String reason) {
+    static OrderErrorEvent buildOrderErrorEvent(OrderEntity order, String reason) {
         return new OrderErrorEvent(
                 UUID.randomUUID().toString(),
                 order.getOrderNumber(),
@@ -51,8 +47,7 @@ public class OrderEventMapper {
                 order.getCustomer(),
                 order.getDeliveryAddress(),
                 reason,
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
     }
 
     private static Set<OrderItem> getOrderItems(OrderEntity order) {

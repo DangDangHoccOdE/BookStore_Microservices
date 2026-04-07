@@ -1,12 +1,11 @@
 package com.bookstore.order.domain.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-public record OrderDTO (
+public record OrderDTO(
         String orderNumber,
         String user,
         Set<OrderItem> items,
@@ -14,8 +13,7 @@ public record OrderDTO (
         Address deliveryAddress,
         OrderStatus orderStatus,
         String comments,
-        LocalDateTime createdAt
-){
+        LocalDateTime createdAt) {
 
     // Khi client gửi lên server sẽ bỏ qua totalAmount
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

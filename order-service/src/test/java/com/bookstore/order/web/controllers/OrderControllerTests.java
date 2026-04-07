@@ -1,15 +1,14 @@
 package com.bookstore.order.web.controllers;
 
+import static io.restassured.RestAssured.given;
+
 import com.bookstore.order.AbstractIT;
 import com.bookstore.order.testdata.TestDataFactory;
 import io.restassured.http.ContentType;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-
-import java.math.BigDecimal;
-
-import static io.restassured.RestAssured.given;
 
 class OrderControllerTests extends AbstractIT {
 

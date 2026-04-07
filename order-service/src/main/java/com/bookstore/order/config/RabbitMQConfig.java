@@ -1,8 +1,8 @@
 package com.bookstore.order.config;
 
 import com.bookstore.order.ApplicationProperties;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -34,22 +34,28 @@ public class RabbitMQConfig {
 
     @Bean
     Queue deliveredOrdersQueue() {
-        return QueueBuilder.durable(applicationProperties.deliveredOrdersQueue()).build();
+        return QueueBuilder.durable(applicationProperties.deliveredOrdersQueue())
+                .build();
     }
 
     @Bean
     Binding deliveredOrdersQueueBinding() {
-        return BindingBuilder.bind(deliveredOrdersQueue()).to(exchange()).with(applicationProperties.deliveredOrdersQueue());
+        return BindingBuilder.bind(deliveredOrdersQueue())
+                .to(exchange())
+                .with(applicationProperties.deliveredOrdersQueue());
     }
 
     @Bean
     Queue cancelledOrdersQueue() {
-        return QueueBuilder.durable(applicationProperties.cancelledOrdersQueue()).build();
+        return QueueBuilder.durable(applicationProperties.cancelledOrdersQueue())
+                .build();
     }
 
     @Bean
     Binding cancelledOrdersQueueBinding() {
-        return BindingBuilder.bind(cancelledOrdersQueue()).to(exchange()).with(applicationProperties.cancelledOrdersQueue());
+        return BindingBuilder.bind(cancelledOrdersQueue())
+                .to(exchange())
+                .with(applicationProperties.cancelledOrdersQueue());
     }
 
     @Bean

@@ -33,6 +33,7 @@ public class OrderEventPublisher {
     public void publish(OrderErrorEvent event) {
         this.send(properties.errorOrdersQueue(), event);
     }
+
     private void send(String routingKey, Object payload) {
         rabbitTemplate.convertAndSend(properties.orderEventsExchange(), routingKey, payload);
     }
