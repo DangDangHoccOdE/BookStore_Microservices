@@ -2,9 +2,8 @@ package com.bookstore.order.domain;
 
 import com.bookstore.order.domain.models.CreateOrderResponse;
 import com.bookstore.order.domain.models.CreatedOrderRequest;
-import java.util.List;
-
 import com.bookstore.order.domain.models.OrderCreatedEvent;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

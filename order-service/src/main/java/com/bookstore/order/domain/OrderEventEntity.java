@@ -2,7 +2,6 @@ package com.bookstore.order.domain;
 
 import com.bookstore.order.domain.models.OrderEventType;
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
