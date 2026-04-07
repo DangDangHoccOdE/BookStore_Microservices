@@ -3,6 +3,8 @@ package com.bookstore.order.domain;
 import com.bookstore.order.domain.models.CreateOrderResponse;
 import com.bookstore.order.domain.models.CreatedOrderRequest;
 import java.util.List;
+
+import com.bookstore.order.domain.models.OrderCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,8 +32,8 @@ public class OrderService {
         newOrder.setUserName(userName);
         OrderEntity savedOrder = orderRepository.save(newOrder);
         log.info("Order created with order number: {}", savedOrder.getOrderNumber());
-        //        OrderCreatedEvent orderCreatedEvent = OrderEventMapper.buildOrderCreatedEvent(savedOrder);
-        //        orderEventService.save(orderCreatedEvent);
+        OrderCreatedEvent orderCreatedEvent = OrderEventMapper.buildOrderCreatedEvent(savedOrder);
+        orderEventService.save(orderCreatedEvent);
         return new CreateOrderResponse(savedOrder.getOrderNumber());
     }
 }

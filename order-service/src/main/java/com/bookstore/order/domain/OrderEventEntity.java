@@ -1,15 +1,8 @@
 package com.bookstore.order.domain;
 
 import com.bookstore.order.domain.models.OrderEventType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,6 +23,7 @@ class OrderEventEntity {
     private OrderEventType eventType;
 
     @Column(nullable = false)
+    @Lob
     private String payload;
 
     @Column(name = "created_at", nullable = false, updatable = false)
