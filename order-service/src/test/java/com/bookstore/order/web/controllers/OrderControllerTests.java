@@ -1,14 +1,20 @@
 package com.bookstore.order.web.controllers;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
 
 import com.bookstore.order.AbstractIT;
+import com.bookstore.order.domain.models.OrderSummary;
 import com.bookstore.order.testdata.TestDataFactory;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import java.math.BigDecimal;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
 
 class OrderControllerTests extends AbstractIT {
 
@@ -61,6 +67,38 @@ class OrderControllerTests extends AbstractIT {
                     .post("/api/orders")
                     .then()
                     .statusCode(HttpStatus.BAD_REQUEST.value());
+        }
+    }
+
+    @Nested
+    @Sql(scripts = "classpath:/test-order.sql")
+    class GetOrderTests {
+        @Test
+        void shouldGetOrderSuccessfully() {
+            List<OrderSummary> orderSummaries = given().when()
+                    .get("/api/orders")
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .extract()
+                    .body()
+                    .as(new TypeRef<>() {});
+
+            assertThat(orderSummaries).hasSize(2);
+        }
+    }
+
+    @Nested
+    @Sql(scripts = "classpath:/test-order.sql")
+    class GetOrderByOrderNumberTests {
+        String orderNumber = "order-123";
+
+        @Test
+        void shouldGetOrderSuccessfully() {
+            given().when()
+                    .get("/api/orders/{orderNumber}", orderNumber)
+                    .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body("orderNumber", is(orderNumber));
         }
     }
 }

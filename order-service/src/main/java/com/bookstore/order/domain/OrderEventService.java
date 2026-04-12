@@ -3,10 +3,11 @@ package com.bookstore.order.domain;
 import com.bookstore.order.domain.models.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,9 @@ public class OrderEventService {
     private final OrderEventRepository orderEventRepository;
     private final OrderEventPublisher orderEventPublisher;
     private final ObjectMapper objectMapper;
+
+    @Value("${orders.outbox.max-retry}")
+    private int maxRetry;
 
     OrderEventService(
             OrderEventRepository orderEventRepository,
@@ -68,14 +72,41 @@ public class OrderEventService {
         this.orderEventRepository.save(orderEvent);
     }
 
+    //    lấy batch PENDING
+    //    mark thành PROCESSING
+    //    publish từng event
+    //    publish xong thì mark PUBLISHED
+    //    nếu lỗi thì mark FAILED và tăng retry
     public void publishOrderEvents() {
-        Sort sort = Sort.by("createdAt").ascending();
-        List<OrderEventEntity> events = orderEventRepository.findAll(sort);
+        List<OrderEventEntity> events = orderEventRepository.lockPendingEvents(50);
         log.info("Found {} Order Events to be published", events.size());
 
         for (OrderEventEntity event : events) {
-            this.publishEvent(event);
-            orderEventRepository.delete(event);
+            try {
+                event.setStatus(OutboxStatus.PROCESSING);
+                event.setLockedAt(LocalDateTime.now());
+                event.setLockedBy("order-service");
+                // Đã có job chạy để update về PENDING nếu PROCESSING quá lâu -> crash app
+                orderEventRepository.save(event);
+
+                publishEvent(event);
+
+                event.setStatus(OutboxStatus.PUBLISHED);
+                event.setPublishedAt(LocalDateTime.now());
+            } catch (Exception e) {
+                event.setRetryCount(event.getRetryCount() + 1);
+
+                // set biến này để cho phép gửi lại
+                if (event.getRetryCount() < maxRetry) {
+                    event.setStatus(OutboxStatus.PENDING);
+                } else {
+                    event.setStatus(OutboxStatus.FAILED);
+                }
+
+                log.error("Publish failed for eventId={}, reason={}", event.getEventId(), e.getMessage(), e);
+            } finally {
+                orderEventRepository.save(event);
+            }
         }
     }
 

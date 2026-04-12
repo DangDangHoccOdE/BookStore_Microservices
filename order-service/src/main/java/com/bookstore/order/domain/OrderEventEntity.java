@@ -1,6 +1,7 @@
 package com.bookstore.order.domain;
 
 import com.bookstore.order.domain.models.OrderEventType;
+import com.bookstore.order.domain.models.OutboxStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -24,6 +25,22 @@ class OrderEventEntity {
     @Column(nullable = false)
     @Lob
     private String payload;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OutboxStatus status = OutboxStatus.PENDING;
+
+    @Column(name = "locked_by")
+    private String lockedBy;
+
+    @Column(name = "locked_at")
+    private LocalDateTime lockedAt;
+
+    @Column(name = "published_at")
+    private LocalDateTime publishedAt;
+
+    @Column(name = "retry_count", nullable = false)
+    private int retryCount = 0;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -85,5 +102,45 @@ class OrderEventEntity {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public OutboxStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OutboxStatus status) {
+        this.status = status;
+    }
+
+    public String getLockedBy() {
+        return lockedBy;
+    }
+
+    public void setLockedBy(String lockedBy) {
+        this.lockedBy = lockedBy;
+    }
+
+    public LocalDateTime getLockedAt() {
+        return lockedAt;
+    }
+
+    public void setLockedAt(LocalDateTime lockedAt) {
+        this.lockedAt = lockedAt;
+    }
+
+    public LocalDateTime getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(LocalDateTime publishedAt) {
+        this.publishedAt = publishedAt;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(int retryCount) {
+        this.retryCount = retryCount;
     }
 }

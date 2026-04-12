@@ -1,9 +1,8 @@
 package com.bookstore.order.domain;
 
-import com.bookstore.order.domain.models.CreateOrderResponse;
-import com.bookstore.order.domain.models.CreatedOrderRequest;
-import com.bookstore.order.domain.models.OrderCreatedEvent;
+import com.bookstore.order.domain.models.*;
 import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,5 +33,48 @@ public class OrderService {
         OrderCreatedEvent orderCreatedEvent = OrderEventMapper.buildOrderCreatedEvent(savedOrder);
         orderEventService.save(orderCreatedEvent);
         return new CreateOrderResponse(savedOrder.getOrderNumber());
+    }
+
+    public Optional<OrderDTO> findUserOrder(String userName, String orderNumber) {
+        return orderRepository
+                .findByUserNameAndOrderNumber(userName, orderNumber)
+                .map(OrderMapper::convertToDTO);
+    }
+
+    public List<OrderSummary> findOrders(String userName) {
+        return orderRepository.findByUserName(userName);
+    }
+
+    public void processNewOrder() {
+        List<OrderEntity> orders = orderRepository.findByStatus(OrderStatus.NEW);
+        log.info("Found {} new orders to process", orders.size());
+        for (OrderEntity order : orders) {
+            process(order);
+        }
+    }
+
+    private void process(OrderEntity order) {
+        try {
+            if (canBeDelivered(order)) {
+                log.info("OrderNumber: {} can be delivered", order.getOrderNumber());
+                orderRepository.updateOrderStatus(order.getOrderNumber(), OrderStatus.DELIVERED);
+                orderEventService.save(OrderEventMapper.buildOrderDeliveredEvent(order));
+            } else {
+                log.info("OrderNumber: {} can not be delivered", order.getOrderNumber());
+                orderRepository.updateOrderStatus(order.getOrderNumber(), OrderStatus.CANCELLED);
+                orderEventService.save(
+                        OrderEventMapper.buildOrderCancelledEvent(order, "Can't deliver to the location"));
+            }
+        } catch (RuntimeException e) {
+            log.error(
+                    "Error processing order with order number: {}. Error: {}", order.getOrderNumber(), e.getMessage());
+            orderRepository.updateOrderStatus(order.getOrderNumber(), OrderStatus.ERROR);
+            orderEventService.save(OrderEventMapper.buildOrderErrorEvent(order, e.getMessage()));
+        }
+    }
+
+    private boolean canBeDelivered(OrderEntity order) {
+        return DELIVERY_ALLOWED_COUNTRIES.contains(
+                order.getDeliveryAddress().country().toUpperCase());
     }
 }

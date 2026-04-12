@@ -179,6 +179,20 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
+
+        <!-- ShedLock -->
+        <!-- Source: https://mvnrepository.com/artifact/net.javacrumbs.shedlock/shedlock-spring -->
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-spring</artifactId>
+            <version>7.7.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-provider-jdbc-template</artifactId>
+            <version>7.7.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -264,11 +278,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                    <compilerArgs>--enable-preview</compilerArgs>
-                </configuration>
             </plugin>
         </plugins>
     </build>
