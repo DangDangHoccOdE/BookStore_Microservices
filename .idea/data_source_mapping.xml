@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourcePerFileMappings">
+    <file url="file://$PROJECT_DIR$/notification-service/src/main/resources/db/migration/V1__create_order_events_table.sql" value="cf1db0ef-db56-4373-9b33-a72ccca0d80a" />
+  </component>
+</project>

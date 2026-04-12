@@ -16,15 +16,6 @@
         </processorPath>
         <module name="notification-service" />
         <module name="catalog-service" />
-      </profile>
-      <profile name="Annotation profile for order-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/4.0.5/spring-boot-configuration-processor-4.0.5.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/4.0.5/spring-boot-configuration-processor-4.0.5.jar" />
-        </processorPath>
         <module name="order-service" />
       </profile>
     </annotationProcessing>
