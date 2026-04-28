@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -49,24 +51,24 @@ public abstract class AbstractIT {
     @Autowired
     protected UserProfileRepository userProfileRepository;
 
-    //    @DynamicPropertySource
-    //    static void registerDynamicProperties(DynamicPropertyRegistry registry) {
-    //        String issuerUri = KEYCLOAK.getAuthServerUrl() + "/realms/" + REALM;
-    //
-    //        registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
-    //        registry.add("spring.datasource.username", POSTGRES::getUsername);
-    //        registry.add("spring.datasource.password", POSTGRES::getPassword);
-    //
-    //        registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuerUri);
-    //        registry.add("security.jwt.required-audience", () -> REQUIRED_AUDIENCE);
-    //
-    //        // Must match your ApplicationProperties(prefix = "users")
-    //        registry.add("users.keycloak.server-url", KEYCLOAK::getAuthServerUrl);
-    //        registry.add("users.keycloak.realm", () -> REALM);
-    //        registry.add("users.keycloak.client-id", () -> CLIENT_ID);
-    //        registry.add("users.keycloak.client-secret", () -> CLIENT_SECRET);
-    //        registry.add("users.keycloak.default-role", () -> "USER");
-    //    }
+        @DynamicPropertySource
+        static void registerDynamicProperties(DynamicPropertyRegistry registry) {
+            String issuerUri = KEYCLOAK.getAuthServerUrl() + "/realms/" + REALM;
+
+            registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+            registry.add("spring.datasource.username", POSTGRES::getUsername);
+            registry.add("spring.datasource.password", POSTGRES::getPassword);
+
+            registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuerUri);
+            registry.add("security.jwt.required-audience", () -> REQUIRED_AUDIENCE);
+
+            // Must match your ApplicationProperties(prefix = "users")
+            registry.add("users.keycloak.server-url", KEYCLOAK::getAuthServerUrl);
+            registry.add("users.keycloak.realm", () -> REALM);
+            registry.add("users.keycloak.client-id", () -> CLIENT_ID);
+            registry.add("users.keycloak.client-secret", () -> CLIENT_SECRET);
+            registry.add("users.keycloak.default-role", () -> "USER");
+        }
 
     @BeforeEach
     void cleanDatabase() {
