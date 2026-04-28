@@ -1,9 +1,7 @@
 package com.bookstore.user.config;
 
 import com.bookstore.user.ApplicationProperties;
-
 import java.util.concurrent.TimeUnit;
-
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;

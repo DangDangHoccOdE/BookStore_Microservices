@@ -43,9 +43,7 @@ public class JwtAuthConverter implements Converter<Jwt, Collection<GrantedAuthor
             if (client instanceof Map<?, ?> clientData) {
                 Object roles = clientData.get("roles");
                 if (roles instanceof Collection<?> list) {
-                    list.forEach(role ->
-                            authorities.add(new SimpleGrantedAuthority("SCOPE_" + role))
-                    );
+                    list.forEach(role -> authorities.add(new SimpleGrantedAuthority("SCOPE_" + role)));
                 }
             }
         }
@@ -55,9 +53,7 @@ public class JwtAuthConverter implements Converter<Jwt, Collection<GrantedAuthor
         if (scope != null) {
             Arrays.stream(scope.split(" "))
                     .filter(s -> !s.isBlank())
-                    .forEach(s ->
-                            authorities.add(new SimpleGrantedAuthority("SCOPE_" + s))
-                    );
+                    .forEach(s -> authorities.add(new SimpleGrantedAuthority("SCOPE_" + s)));
         }
 
         return authorities;

@@ -1,21 +1,20 @@
 package com.bookstore.user.web;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.bookstore.user.AbstractIT;
 import com.bookstore.user.domain.UserEntity;
 import com.bookstore.user.domain.UserProfileEntity;
 import com.bookstore.user.domain.UserStatus;
+import java.time.OffsetDateTime;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
-
-import java.time.OffsetDateTime;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class UserControllerIT extends AbstractIT {
     @Autowired
@@ -33,60 +32,65 @@ public class UserControllerIT extends AbstractIT {
                 "firstName", "string",
                 "lastName", "string",
                 "phone", "0123456789",
-                "avatarUrl", "https://img.example.com/a.png"
-        );
+                "avatarUrl", "https://img.example.com/a.png");
 
-        webTestClient.post()
+        webTestClient
+                .post()
                 .uri("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isCreated()
+                .expectStatus()
+                .isCreated()
                 .expectBody()
-                .jsonPath("$.username").isEqualTo(username)
-                .jsonPath("$.email").isEqualTo(email)
-                .jsonPath("$.keycloakUserId").isNotEmpty();
+                .jsonPath("$.username")
+                .isEqualTo(username)
+                .jsonPath("$.email")
+                .isEqualTo(email)
+                .jsonPath("$.keycloakUserId")
+                .isNotEmpty();
 
         // DB verification
         var dbUser = userRepository.findByEmail(email).orElseThrow();
         assertThat(dbUser.getUsername()).isEqualTo(username);
 
         // Keycloak verify
-        Awaitility.await()
-                .atMost(5, TimeUnit.SECONDS)
-                .untilAsserted(() ->
-                        assertThat(findRealmUserByUserName(username)).isPresent()
-                );
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat(findRealmUserByUserName(username))
+                .isPresent());
     }
 
     @Test
     void register_shouldReturn409_whenDuplicateUserInKeyCloak() {
         String username = "dup_" + System.currentTimeMillis();
-        String email = username+"@gmail.com";
+        String email = username + "@gmail.com";
 
         Map<String, Object> request = Map.of(
                 "email", email,
                 "username", username,
-                "password", "Password123"
-        );
+                "password", "Password123");
 
         // first call OK
-        webTestClient.post()
+        webTestClient
+                .post()
                 .uri("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isCreated();
+                .expectStatus()
+                .isCreated();
 
         // second call duplicate -> 409
-        webTestClient.post()
+        webTestClient
+                .post()
                 .uri("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isEqualTo(409)
+                .expectStatus()
+                .isEqualTo(409)
                 .expectBody()
-                .jsonPath("$.title").isEqualTo("User Already Exists");
+                .jsonPath("$.title")
+                .isEqualTo("User Already Exists");
 
         assertThat(userRepository.findByEmail(email)).isPresent();
     }
@@ -109,15 +113,16 @@ public class UserControllerIT extends AbstractIT {
         Map<String, Object> request = Map.of(
                 "email", conflictEmail,
                 "username", username,
-                "password", "Password123"
-        );
+                "password", "Password123");
 
-        webTestClient.post()
+        webTestClient
+                .post()
                 .uri("/api/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isEqualTo(409);
+                .expectStatus()
+                .isEqualTo(409);
 
         assertThat(findRealmUserByUserName(username)).isEmpty();
 
@@ -129,7 +134,8 @@ public class UserControllerIT extends AbstractIT {
 
     @Test
     void me_shouldReturnCurrentUser_whenTokenValid() {
-        var alice = findRealmUserByUserName("user12").orElseThrow(() -> new IllegalArgumentException("alice user not found in Keycloak"));
+        var alice = findRealmUserByUserName("user12")
+                .orElseThrow(() -> new IllegalArgumentException("alice user not found in Keycloak"));
 
         UserEntity user = new UserEntity();
         user.setId(UUID.randomUUID());
@@ -151,33 +157,39 @@ public class UserControllerIT extends AbstractIT {
         userProfileRepository.saveAndFlush(profile);
 
         String token = getAccessToken("user12", "123");
-        webTestClient.get()
+        webTestClient
+                .get()
                 .uri("/api/users/me")
                 .headers(h -> h.setBasicAuth(token))
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus()
+                .isOk()
                 .expectBody()
-                .jsonPath("$.username").isEqualTo("user12")
-                .jsonPath("$.profile.firstName").isEqualTo("Alice");
+                .jsonPath("$.username")
+                .isEqualTo("user12")
+                .jsonPath("$.profile.firstName")
+                .isEqualTo("Alice");
     }
 
     @Test
     void me_shouldReturn404_whenUserNotFoundInLocalDb() {
         String token = getAccessToken("alice", "password");
 
-        webTestClient.get()
+        webTestClient
+                .get()
                 .uri("/api/users/me")
                 .headers(h -> h.setBasicAuth(token))
                 .exchange()
-                .expectStatus().isNotFound()
+                .expectStatus()
+                .isNotFound()
                 .expectBody()
-                .jsonPath("$.title").isEqualTo("User Not Found");
+                .jsonPath("$.title")
+                .isEqualTo("User Not Found");
     }
 
     @Test
     void updateMe_shouldUpdateProfile() {
-        var alice = findRealmUserByUserName("user12")
-                .orElseThrow();
+        var alice = findRealmUserByUserName("user12").orElseThrow();
 
         UserEntity user = new UserEntity();
         user.setId(UUID.randomUUID());
@@ -195,41 +207,48 @@ public class UserControllerIT extends AbstractIT {
                 "firstName", "Alice",
                 "lastName", "Hoang",
                 "phone", "0123123123",
-                "avatarUrl", "https://img.example.com/a.png"
-        );
+                "avatarUrl", "https://img.example.com/a.png");
 
-        webTestClient.put()
+        webTestClient
+                .put()
                 .uri("/api/users/me")
                 .headers(h -> h.setBasicAuth(token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus()
+                .isOk()
                 .expectBody()
-                .jsonPath("$.profile.firstName").isEqualTo("Alice")
-                .jsonPath("$.profile.phone").isEqualTo("0123123123");
+                .jsonPath("$.profile.firstName")
+                .isEqualTo("Alice")
+                .jsonPath("$.profile.phone")
+                .isEqualTo("0123123123");
     }
 
     @Test
     void updateMe_shouldReturn401_whenNoToken() {
-        webTestClient.put()
+        webTestClient
+                .put()
                 .uri("/api/users/me")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("firstName", "Alice"))
                 .exchange()
-                .expectStatus().isUnauthorized();
+                .expectStatus()
+                .isUnauthorized();
     }
 
     @Test
-    void updateMe_shouldReturn404_whenUserNotFoundInLocalDb(){
+    void updateMe_shouldReturn404_whenUserNotFoundInLocalDb() {
         String token = getAccessToken("alice", "password");
 
-        webTestClient.put()
+        webTestClient
+                .put()
                 .uri("/api/users/me")
                 .headers(h -> h.setBasicAuth(token))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("firstName", "Alice"))
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus()
+                .isNotFound();
     }
 }

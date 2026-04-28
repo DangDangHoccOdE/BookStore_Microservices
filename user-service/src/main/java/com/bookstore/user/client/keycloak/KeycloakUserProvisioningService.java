@@ -103,37 +103,25 @@ public class KeycloakUserProvisioningService {
             RoleRepresentation userRole = realm.roles().get(defaultRole).toRepresentation();
 
             // Assign client role
-            var client = realm.clients()
-                    .findByClientId(clientId)
-                    .stream()
+            var client = realm.clients().findByClientId(clientId).stream()
                     .findFirst()
                     .orElseThrow();
 
             String clientUuid = client.getId();
 
-            var clientRoles = realm.clients()
-                    .get(clientUuid)
-                    .roles();
+            var clientRoles = realm.clients().get(clientUuid).roles();
 
             List<RoleRepresentation> rolesToAssign = List.of(
                     clientRoles.get("user.read").toRepresentation(),
-                    clientRoles.get("user.update").toRepresentation()
-            );
+                    clientRoles.get("user.update").toRepresentation());
 
             if (userRole == null) {
                 throw new IllegalStateException("Realm role not found: " + defaultRole);
             }
 
-            realm.users().
-                    get(keycloakUserId).
-                    roles().realmLevel().
-                    add(List.of(userRole));
+            realm.users().get(keycloakUserId).roles().realmLevel().add(List.of(userRole));
 
-            realm.users()
-                    .get(keycloakUserId)
-                    .roles()
-                    .clientLevel(clientUuid)
-                    .add(rolesToAssign);
+            realm.users().get(keycloakUserId).roles().clientLevel(clientUuid).add(rolesToAssign);
 
             log.info("Default role {} assigned to user. userId={}", defaultRole, keycloakUserId);
         } catch (Exception ex) {
