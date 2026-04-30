@@ -17,7 +17,9 @@ class ProductControllerTest extends AbstractIT {
 
     @Test
     void shouldReturnProducts() {
+        String token = getAccessToken("user12", "123");
         given().contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
                 .when()
                 .get("/api/products")
                 .then()
@@ -34,7 +36,9 @@ class ProductControllerTest extends AbstractIT {
 
     @Test
     void shouldGetProductByCode() {
+        String token = getAccessToken("user12", "123");
         Product product = given().contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
                 .when()
                 .get("/api/products/{code}", "P100")
                 .then()
@@ -53,7 +57,9 @@ class ProductControllerTest extends AbstractIT {
     @Test
     void shouldReturnNotFoundWhenProductCodeNotExists() {
         String code = "invalid_product_code";
+        String token = getAccessToken("user12", "123");
         given().contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + token)
                 .when()
                 .get("/api/products/{code}", code)
                 .then()

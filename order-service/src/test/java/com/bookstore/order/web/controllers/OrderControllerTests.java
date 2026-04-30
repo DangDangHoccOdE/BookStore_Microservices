@@ -23,6 +23,8 @@ class OrderControllerTests extends AbstractIT {
         @Test
         void shouldCreateOrderSuccessfully() {
             mockGetProductByCode("P100", "Product 1", new BigDecimal("25.50"));
+            String token = getAccessToken("user12", "123");
+
             var payload =
                     """
                             {
@@ -50,6 +52,7 @@ class OrderControllerTests extends AbstractIT {
                             }
                     """;
             given().contentType(ContentType.JSON)
+                    .header("Authorization", "Bearer " + token)
                     .body(payload)
                     .when()
                     .post("/api/orders")
@@ -60,8 +63,10 @@ class OrderControllerTests extends AbstractIT {
 
         @Test
         void shouldReturnBadRequestWhenMandatoryDataIsMissing() {
+            String token = getAccessToken("user12", "123");
             var payload = TestDataFactory.createOrderRequestWithInvalidCustomer();
             given().contentType(ContentType.JSON)
+                    .header("Authorization", "Bearer " + token)
                     .body(payload)
                     .when()
                     .post("/api/orders")
@@ -75,7 +80,9 @@ class OrderControllerTests extends AbstractIT {
     class GetOrderTests {
         @Test
         void shouldGetOrderSuccessfully() {
-            List<OrderSummary> orderSummaries = given().when()
+            String token = getAccessToken("user12", "123");
+            List<OrderSummary> orderSummaries = given().header("Authorization", "Bearer " + token)
+                    .when()
                     .get("/api/orders")
                     .then()
                     .statusCode(HttpStatus.OK.value())
@@ -94,7 +101,9 @@ class OrderControllerTests extends AbstractIT {
 
         @Test
         void shouldGetOrderSuccessfully() {
-            given().when()
+            String token = getAccessToken("user12", "123");
+            given().header("Authorization", "Bearer " + token)
+                    .when()
                     .get("/api/orders/{orderNumber}", orderNumber)
                     .then()
                     .statusCode(HttpStatus.OK.value())
