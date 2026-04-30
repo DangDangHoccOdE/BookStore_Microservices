@@ -29,9 +29,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 public abstract class AbstractIT {
     private static final String REALM = "bookstore";
-    private static final String CLIENT_ID = "user-service-client";
+    private static final String CLIENT_ID = "user-service-admin";
     private static final String CLIENT_SECRET = "Su2ewBLfHmdmvFRE5qRruSu68oCgRHED";
-    private static final String REQUIRED_AUDIENCE = "user-service-client";
+    private static final String REQUIRED_AUDIENCE = "user-service-api";
 
     @Container
     static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:16-alpine")

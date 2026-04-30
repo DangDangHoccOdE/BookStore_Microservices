@@ -7,6 +7,7 @@ import com.bookstore.catalog.domain.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,12 +21,15 @@ class ProductController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     PagedResult<Product> getAllProducts(@RequestParam(name = "page", defaultValue = "1") int pageNo) {
         return productService.getProducts(pageNo);
     }
 
     @GetMapping("/{code}")
+    @PreAuthorize("hasAuthority('SCOPE_catalog.read')")
     ResponseEntity<Product> getProductByCode(@PathVariable String code) {
+        log.debug("GET /products/{}", code);
         return productService
                 .getProductByCode(code)
                 .map(ResponseEntity::ok)

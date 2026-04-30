@@ -24,12 +24,6 @@ public class KeycloakUserProvisioningService {
     public KeycloakUserProvisioningService(Keycloak keycloak, ApplicationProperties properties) {
         this.keycloak = keycloak;
         this.properties = properties;
-
-        log.info("Keycloak config:");
-        log.info("serverUrl = {}", properties.keycloak().serverUrl());
-        log.info("realm = {}", properties.keycloak().realm());
-        log.info("clientId = {}", properties.keycloak().clientId());
-        log.info("clientSecret = {}", properties.keycloak().clientSecret());
     }
 
     @Retry(name = "keycloak")
@@ -97,7 +91,7 @@ public class KeycloakUserProvisioningService {
         try {
             var realm = keycloak.realm(properties.keycloak().realm());
             String defaultRole = properties.keycloak().defaultRole();
-            String clientId = properties.keycloak().clientId();
+            String clientId = properties.keycloak().adminClientId();
 
             // Assign realm role
             RoleRepresentation userRole = realm.roles().get(defaultRole).toRepresentation();
@@ -105,7 +99,7 @@ public class KeycloakUserProvisioningService {
             // Assign client role
             var client = realm.clients().findByClientId(clientId).stream()
                     .findFirst()
-                    .orElseThrow();
+                    .orElseThrow(() -> new IllegalStateException("Client not found in Keycloak: " + clientId));
 
             String clientUuid = client.getId();
 
@@ -113,7 +107,10 @@ public class KeycloakUserProvisioningService {
 
             List<RoleRepresentation> rolesToAssign = List.of(
                     clientRoles.get("user.read").toRepresentation(),
-                    clientRoles.get("user.update").toRepresentation());
+                    clientRoles.get("user.update").toRepresentation(),
+                    clientRoles.get("order.create").toRepresentation(),
+                    clientRoles.get("order.read").toRepresentation(),
+                    clientRoles.get("catalog.read").toRepresentation());
 
             if (userRole == null) {
                 throw new IllegalStateException("Realm role not found: " + defaultRole);

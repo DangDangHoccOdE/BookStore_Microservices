@@ -1,6 +1,6 @@
-package com.bookstore.user.config;
+package com.bookstore.catalog.config;
 
-import com.bookstore.user.ApplicationProperties;
+import com.bookstore.catalog.ApplicationProperties;
 import java.util.*;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,7 +12,7 @@ public class JwtAuthConverter implements Converter<Jwt, Collection<GrantedAuthor
     private final String clientId;
 
     public JwtAuthConverter(ApplicationProperties properties) {
-        this.clientId = properties.keycloak().adminClientId();
+        this.clientId = properties.keycloak().clientId();
     }
 
     private List<SimpleGrantedAuthority> extractRoles(Object rolesObj) {

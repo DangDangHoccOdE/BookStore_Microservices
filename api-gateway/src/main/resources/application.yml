@@ -6,7 +6,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health,info,prometheus
 
 spring:
   application:
@@ -22,18 +22,42 @@ spring:
                 - Path=/catalog/**
               filters:
                 - RewritePath=/catalog/?(?<segment>.*), /${segment}
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 20
+                    redis-rate-limiter.burstCapacity: 40
+                    key-resolver: "#{@principalOrIpKeyResolver}"
+
             - id: orders-service
               uri: ${ORDER_SERVICE_URL:http://localhost:8082}
               predicates:
                 - Path=/orders/**
               filters:
                 - RewritePath=/orders/?(?<segment>.*), /${segment}
-            - id: openapi
-              uri: http://localhost:${server.port}
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    key-resolver: "#{@principalOrIpKeyResolver}"
+
+            - id: users-service
+              uri: ${USER_SERVICE_URL:http://localhost:8084}
               predicates:
-                - Path=/v3/api-docs/**
+                - Path=/users/**
               filters:
-                - RewritePath=/v3/api-docs/?(?<segment>.*), /${segment}/v3/api-docs
+                - RewritePath=/users/?(?<segment>.*), /${segment}
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    key-resolver: "#{@principalOrIpKeyResolver}"
+
+#            - id: openapi
+#              uri: http://localhost:${server.port}
+#              predicates:
+#                - Path=/v3/api-docs/**
+#              filters:
+#                - RewritePath=/v3/api-docs/?(?<segment>.*), /${segment}/v3/api-docs
           discovery:
             locator:
               enabled: true
@@ -51,8 +75,26 @@ spring:
     problemdetails:
       enabled: true
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:9191/realms/bookstore}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+security:
+  jwt:
+    required-audience: ${JWT_REQUIRED_AUDIENCE:api-gateway}
+
 springdoc:
   swagger-ui:
+    oauth:
+      client-id: swagger-ui-client
+      use-pkce-with-authorization-code-grant: true
     use-root-path: true
 #    urls:
 #      - name: catalog

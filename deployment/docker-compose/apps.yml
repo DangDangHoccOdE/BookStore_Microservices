@@ -23,7 +23,7 @@ services:
     container_name: order-service
     environment:
         - SPRING_PROFILES_ACTIVE=docker
-        - ORDERS_CATALOG_SERVICE_URL=http://api-gatway:8989/catalog
+        - ORDERS_CATALOG_SERVICE_URL=http://api-gateway:8989/catalog
         - DB_URL=jdbc:postgresql://orders-db:5432/postgres
         - DB_USERNAME=postgres
         - DB_PASSWORD=postgres

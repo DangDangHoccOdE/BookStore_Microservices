@@ -12,6 +12,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,6 +30,7 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('SCOPE_order.create')")
     CreateOrderResponse createOrder(@Valid @RequestBody CreatedOrderRequest request) {
         String userName = securityService.getLoginUserName();
         log.info("Creating order for user: {}", userName);
@@ -36,6 +38,7 @@ public class OrderController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     List<OrderSummary> getOrders() {
         String userName = securityService.getLoginUserName();
         log.info("Retrieving orders for user: {}", userName);
@@ -43,6 +46,7 @@ public class OrderController {
     }
 
     @GetMapping(value = "/{orderNumber}")
+    @PreAuthorize("hasAuthority('SCOPE_order.read')")
     OrderDTO getOrder(@PathVariable String orderNumber) {
         log.info("Retrieving order for user: {}", orderNumber);
         String userName = securityService.getLoginUserName();
