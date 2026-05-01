@@ -17,7 +17,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Import(TestcontainersConfiguration.class)
@@ -27,23 +26,22 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public abstract class AbstractIT {
     private static final String REALM = "bookstore";
     private static final String CLIENT_ID = "user-service-admin";
-    private static final String CLIENT_SECRET = "Su2ewBLfHmdmvFRE5qRruSu68oCgRHED";
+    private static final String CLIENT_SECRET = "test-secret";
     private static final String REQUIRED_AUDIENCE = "catalog-service-api";
 
     @LocalServerPort
     int port;
 
-    @Container
-    static final KeycloakContainer KEYCLOAK = new KeycloakContainer("quay.io/keycloak/keycloak:26.3.0")
-            .withRealmImportFile("/bookstore-realm.json")
-            .withAdminUsername("admin_new")
-            .withAdminPassword("123");
+    static final KeycloakContainer KEYCLOAK = SharedKeycloak.INSTANCE;
 
     @DynamicPropertySource
     static void registerDynamicProperties(DynamicPropertyRegistry registry) {
-        String issuerUri = KEYCLOAK.getAuthServerUrl() + "/realms/" + REALM;
+        String issuer = KEYCLOAK.getAuthServerUrl() + "/realms/" + REALM;
 
-        registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuerUri);
+        registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuer);
+        registry.add(
+                "spring.security.oauth2.resourceserver.jwt.jwk-set-uri",
+                () -> issuer + "/protocol/openid-connect/certs");
         registry.add("security.jwt.required-audience", () -> REQUIRED_AUDIENCE);
         registry.add("services.keycloak.client-id", () -> CLIENT_ID);
     }

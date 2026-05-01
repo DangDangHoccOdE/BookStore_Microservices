@@ -19,12 +19,12 @@ class ProductControllerTest extends AbstractIT {
 
     @Test
     void shouldReturnProducts() throws JsonProcessingException {
-        String token = getAccessToken("usertest", "usertest");
+        String token = getAccessToken("usertest", "password");
 
         webTestClient
                 .get()
                 .uri("/api/products")
-                .headers(h -> h.setBearerAuth(token)) // ✅ QUAN TRỌNG
+                .headers(h -> h.setBearerAuth(token))
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -49,7 +49,7 @@ class ProductControllerTest extends AbstractIT {
 
     @Test
     void shouldGetProductByCode() throws JsonProcessingException {
-        String token = getAccessToken("usertest", "usertest");
+        String token = getAccessToken("usertest", "password");
 
         Product product = webTestClient
                 .get()
@@ -72,7 +72,7 @@ class ProductControllerTest extends AbstractIT {
     @Test
     void shouldReturnNotFoundWhenProductCodeNotExists() throws JsonProcessingException {
         String code = "invalid_product_code";
-        String token = getAccessToken("usertest", "usertest");
+        String token = getAccessToken("usertest", "password");
 
         webTestClient
                 .get()

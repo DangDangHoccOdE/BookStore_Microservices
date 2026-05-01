@@ -25,7 +25,7 @@ class OrderControllerTests extends AbstractIT {
         @Test
         void shouldCreateOrderSuccessfully() {
             mockGetProductByCode("P100", "Product 1", new BigDecimal("25.50"));
-            String token = getAccessToken("usertest", "usertest");
+            String token = getAccessToken("usertest", "password");
 
             String payload =
                     """
@@ -70,7 +70,7 @@ class OrderControllerTests extends AbstractIT {
 
         @Test
         void shouldReturnBadRequestWhenMandatoryDataIsMissing() {
-            String token = getAccessToken("usertest", "usertest");
+            String token = getAccessToken("usertest", "password");
             var payload = TestDataFactory.createOrderRequestWithInvalidCustomer();
 
             webTestClient
@@ -91,7 +91,7 @@ class OrderControllerTests extends AbstractIT {
 
         @Test
         void shouldGetOrderSuccessfully() {
-            String token = getAccessToken("usertest", "usertest");
+            String token = getAccessToken("usertest", "password");
 
             List<OrderSummary> orders = webTestClient
                     .get()
@@ -116,7 +116,7 @@ class OrderControllerTests extends AbstractIT {
 
         @Test
         void shouldGetOrderSuccessfully() {
-            String token = getAccessToken("usertest", "usertest");
+            String token = getAccessToken("usertest", "password");
 
             webTestClient
                     .get()

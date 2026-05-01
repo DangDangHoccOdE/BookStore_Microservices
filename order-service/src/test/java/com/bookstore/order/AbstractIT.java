@@ -20,7 +20,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.integrations.testcontainers.WireMockContainer;
 
@@ -31,29 +30,39 @@ import org.wiremock.integrations.testcontainers.WireMockContainer;
 public abstract class AbstractIT {
     private static final String REALM = "bookstore";
     private static final String CLIENT_ID = "user-service-admin";
-    private static final String CLIENT_SECRET = "Su2ewBLfHmdmvFRE5qRruSu68oCgRHED";
+    private static final String CLIENT_SECRET = "test-secret";
     private static final String REQUIRED_AUDIENCE = "order-service-api";
 
     @LocalServerPort
     int port;
 
-    @Container
-    static final KeycloakContainer KEYCLOAK = new KeycloakContainer("quay.io/keycloak/keycloak:26.3.0")
-            .withRealmImportFile("/bookstore-realm.json")
-            .withAdminUsername("admin_new")
-            .withAdminPassword("123");
+    static final KeycloakContainer KEYCLOAK = SharedKeycloak.INSTANCE;
 
-    static WireMockContainer wireMockContainer = new WireMockContainer("wiremock/wiremock:3.5.2-alpine");
+    static {
+        // Đảm bảo Keycloak đã start xong trước khi
+        // @DynamicPropertySource chạy và Spring context được tạo
+        if (!KEYCLOAK.isRunning()) {
+            KEYCLOAK.start();
+        }
+    }
 
     @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        String issuerUri = KEYCLOAK.getAuthServerUrl() + "/realms/" + REALM;
+    static void registerDynamicProperties(DynamicPropertyRegistry registry) {
+        String issuer = KEYCLOAK.getAuthServerUrl() + "/realms/" + REALM;
 
-        registry.add("orders.catalog-service-url", wireMockContainer::getBaseUrl);
-        registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuerUri);
+        registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuer);
+        //        registry.add(
+        //                "spring.security.oauth2.resourceserver.jwt.jwk-set-uri",
+        //                () -> issuer + "/protocol/openid-connect/certs");
         registry.add("security.jwt.required-audience", () -> REQUIRED_AUDIENCE);
-        registry.add("orders.keycloak.client-id", () -> CLIENT_ID);
+        registry.add("services.keycloak.client-id", () -> CLIENT_ID);
+
+        registry.add(
+                "orders.catalog-service-url",
+                () -> "http://" + wireMockContainer.getHost() + ":" + wireMockContainer.getPort());
     }
+
+    static WireMockContainer wireMockContainer = new WireMockContainer("wiremock/wiremock:3.5.2-alpine");
 
     @BeforeAll
     static void beforeAll() {
