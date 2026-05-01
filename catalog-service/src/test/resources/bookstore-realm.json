@@ -106,7 +106,6 @@
       }
     ],
     "client": {
-      "order-service-api": [],
       "realm-management": [
         {
           "id": "d9e8662a-6713-4e10-a86e-f911532747cf",
@@ -320,56 +319,10 @@
         }
       ],
       "security-admin-console": [],
-      "bookstore-webapp": [],
-      "account-console": [],
-      "user-service-api": [],
-      "broker": [
-        {
-          "id": "d01a8a73-9c0b-4117-9d94-ae4cfcdc1fca",
-          "name": "read-token",
-          "description": "${role_read-token}",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "25fa157d-9c34-479d-8077-17b01184827f",
-          "attributes": {}
-        }
-      ],
-      "notification-service-api": [],
-      "api-gateway": [],
-      "admin-cli": [],
-      "swagger-ui-client": [],
-      "catalog-service-api": [],
-      "user-service-admin": [
-        {
-          "id": "dd2a5d52-6a31-446f-adaa-6aee135aa6d9",
-          "name": "order.read",
-          "description": "",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "59b6857e-ebb7-4d65-8c5c-9da224e9d096",
-          "attributes": {}
-        },
+      "user-service-client": [
         {
           "id": "daa13322-4a29-40c3-8b47-e1cb2a4eb988",
           "name": "user.read",
-          "description": "",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "59b6857e-ebb7-4d65-8c5c-9da224e9d096",
-          "attributes": {}
-        },
-        {
-          "id": "d4a55441-0586-40f5-bc73-4801bb4a41f9",
-          "name": "catalog.read",
-          "description": "",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "59b6857e-ebb7-4d65-8c5c-9da224e9d096",
-          "attributes": {}
-        },
-        {
-          "id": "9b40efd6-6965-4f18-b2e3-b3917a24550b",
-          "name": "order.create",
           "description": "",
           "composite": false,
           "clientRole": true,
@@ -383,6 +336,20 @@
           "composite": false,
           "clientRole": true,
           "containerId": "59b6857e-ebb7-4d65-8c5c-9da224e9d096",
+          "attributes": {}
+        }
+      ],
+      "bookstore-webapp": [],
+      "admin-cli": [],
+      "account-console": [],
+      "broker": [
+        {
+          "id": "d01a8a73-9c0b-4117-9d94-ae4cfcdc1fca",
+          "name": "read-token",
+          "description": "${role_read-token}",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "25fa157d-9c34-479d-8077-17b01184827f",
           "attributes": {}
         }
       ],
@@ -531,26 +498,13 @@
   "webAuthnPolicyPasswordlessExtraOrigins": [],
   "users": [
     {
-      "username": "usertest",
-      "enabled": true,
-      "emailVerified": true,
-      "requiredActions": [],
-      "credentials": [
-        {
-          "type": "password",
-          "value": "usertest",
-          "temporary": false
-        }
-      ]
-    },
-    {
       "id": "0afbb9ea-79bb-4e45-b1c7-48aced6e1e74",
-      "username": "service-account-user-service-admin",
+      "username": "service-account-user-service-client",
       "emailVerified": false,
       "enabled": true,
       "createdTimestamp": 1776696441716,
       "totp": false,
-      "serviceAccountClientId": "user-service-admin",
+      "serviceAccountClientId": "user-service-client",
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
@@ -558,13 +512,10 @@
       ],
       "clientRoles": {
         "realm-management": [
-          "query-users",
           "manage-users",
           "view-clients",
           "manage-realm",
-          "view-users",
-          "query-clients",
-          "view-realm"
+          "view-users"
         ]
       },
       "notBefore": 0,
@@ -741,61 +692,6 @@
       ]
     },
     {
-      "id": "def5fd23-d749-4c44-b160-abf0bb1b7705",
-      "clientId": "api-gateway",
-      "name": "api-gateway",
-      "description": "",
-      "rootUrl": "",
-      "adminUrl": "",
-      "baseUrl": "",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": false,
-      "clientAuthenticatorType": "client-secret",
-      "redirectUris": [
-        "/*"
-      ],
-      "webOrigins": [
-        "/*"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": false,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
-      "frontchannelLogout": true,
-      "protocol": "openid-connect",
-      "attributes": {
-        "realm_client": "false",
-        "oidc.ciba.grant.enabled": "false",
-        "backchannel.logout.session.required": "true",
-        "standard.token.exchange.enabled": "false",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "backchannel.logout.revoke.offline.tokens": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "organization",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
       "id": "a525ea33-8bc6-45b5-9a14-49eb242e813a",
       "clientId": "bookstore-webapp",
       "name": "BookStore",
@@ -880,171 +776,6 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "organization",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
-      "id": "31c9a545-2268-459e-8f22-8c924549902a",
-      "clientId": "catalog-service-api",
-      "name": "catalog-service-api",
-      "description": "",
-      "rootUrl": "",
-      "adminUrl": "",
-      "baseUrl": "",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": false,
-      "clientAuthenticatorType": "client-secret",
-      "redirectUris": [
-        "/*"
-      ],
-      "webOrigins": [
-        "/*"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": false,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
-      "frontchannelLogout": true,
-      "protocol": "openid-connect",
-      "attributes": {
-        "realm_client": "false",
-        "oidc.ciba.grant.enabled": "false",
-        "backchannel.logout.session.required": "true",
-        "standard.token.exchange.enabled": "false",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "backchannel.logout.revoke.offline.tokens": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "organization",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
-      "id": "7057f011-d952-49e9-8b05-017a230008c0",
-      "clientId": "notification-service-api",
-      "name": "notification-service-api",
-      "description": "",
-      "rootUrl": "",
-      "adminUrl": "",
-      "baseUrl": "",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": false,
-      "clientAuthenticatorType": "client-secret",
-      "redirectUris": [
-        "/*"
-      ],
-      "webOrigins": [
-        "/*"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": false,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
-      "frontchannelLogout": true,
-      "protocol": "openid-connect",
-      "attributes": {
-        "realm_client": "false",
-        "oidc.ciba.grant.enabled": "false",
-        "backchannel.logout.session.required": "true",
-        "standard.token.exchange.enabled": "false",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "backchannel.logout.revoke.offline.tokens": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "organization",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
-      "id": "16f21f77-55e6-488e-8f22-ea915cdf915f",
-      "clientId": "order-service-api",
-      "name": "order-service-api",
-      "description": "",
-      "rootUrl": "",
-      "adminUrl": "",
-      "baseUrl": "",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": false,
-      "clientAuthenticatorType": "client-secret",
-      "redirectUris": [
-        "/*"
-      ],
-      "webOrigins": [
-        "/*"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": false,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
-      "frontchannelLogout": true,
-      "protocol": "openid-connect",
-      "attributes": {
-        "realm_client": "false",
-        "oidc.ciba.grant.enabled": "false",
-        "backchannel.logout.session.required": "true",
-        "standard.token.exchange.enabled": "false",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "backchannel.logout.revoke.offline.tokens": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
       "defaultClientScopes": [
         "web-origins",
         "acr",
@@ -1174,139 +905,9 @@
       ]
     },
     {
-      "id": "25564424-a13f-4cf6-9508-386bad08f733",
-      "clientId": "swagger-ui-client",
-      "name": "swagger-ui-client",
-      "description": "",
-      "rootUrl": "",
-      "adminUrl": "",
-      "baseUrl": "",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": false,
-      "clientAuthenticatorType": "client-secret",
-      "redirectUris": [
-        "http://localhost:8989/swagger-ui/oauth2-redirect.html"
-      ],
-      "webOrigins": [
-        "http://localhost:8989"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
-      "frontchannelLogout": true,
-      "protocol": "openid-connect",
-      "attributes": {
-        "realm_client": "false",
-        "oidc.ciba.grant.enabled": "false",
-        "backchannel.logout.session.required": "true",
-        "standard.token.exchange.enabled": "false",
-        "frontchannel.logout.session.required": "true",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "display.on.consent.screen": "false",
-        "pkce.code.challenge.method": "S256",
-        "backchannel.logout.revoke.offline.tokens": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "protocolMappers": [
-        {
-          "id": "a5d2bc66-fa8f-46cc-a7b7-1f7563ed774c",
-          "name": "catalog-service-api",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-audience-mapper",
-          "consentRequired": false,
-          "config": {
-            "included.client.audience": "catalog-service-api",
-            "id.token.claim": "false",
-            "lightweight.claim": "false",
-            "access.token.claim": "true",
-            "introspection.token.claim": "true"
-          }
-        },
-        {
-          "id": "ca8ea616-77ce-417b-8d9e-50ec9b323ff2",
-          "name": "api-gateway",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-audience-mapper",
-          "consentRequired": false,
-          "config": {
-            "included.client.audience": "api-gateway",
-            "id.token.claim": "false",
-            "lightweight.claim": "false",
-            "access.token.claim": "true",
-            "introspection.token.claim": "true"
-          }
-        },
-        {
-          "id": "ffa8e0e1-f2c1-4636-a150-9844bb3157a9",
-          "name": "order-service-api",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-audience-mapper",
-          "consentRequired": false,
-          "config": {
-            "included.client.audience": "order-service-api",
-            "id.token.claim": "false",
-            "lightweight.claim": "false",
-            "access.token.claim": "true",
-            "introspection.token.claim": "true"
-          }
-        },
-        {
-          "id": "d2c2b96f-6003-4544-a011-dde684a120aa",
-          "name": "notification-service-api",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-audience-mapper",
-          "consentRequired": false,
-          "config": {
-            "included.client.audience": "notification-service-api",
-            "id.token.claim": "false",
-            "lightweight.claim": "false",
-            "access.token.claim": "true",
-            "introspection.token.claim": "true"
-          }
-        },
-        {
-          "id": "5b0d19de-7f60-47bc-ae69-3fc4a76c0afa",
-          "name": "user-service-api",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-audience-mapper",
-          "consentRequired": false,
-          "config": {
-            "included.client.audience": "user-service-api",
-            "id.token.claim": "false",
-            "lightweight.claim": "false",
-            "access.token.claim": "true",
-            "introspection.token.claim": "true"
-          }
-        }
-      ],
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "organization",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
       "id": "59b6857e-ebb7-4d65-8c5c-9da224e9d096",
-      "clientId": "user-service-admin",
-      "name": "user-service-admin",
+      "clientId": "user-service-client",
+      "name": "user-service-client",
       "description": "",
       "rootUrl": "http://localhost:8084",
       "adminUrl": "http://localhost:8084",
@@ -1315,7 +916,7 @@
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "my-test-secret",
+      "secret": "**********",
       "redirectUris": [
         "http://localhost:8084/*"
       ],
@@ -1325,7 +926,7 @@
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
-      "standardFlowEnabled": false,
+      "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": true,
@@ -1348,64 +949,27 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "id": "10b85d3a-0293-47ed-9601-9bd7d26c73e6",
+          "name": "user-service",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "user-service-client",
+            "introspection.token.claim": "true",
+            "included.custom.audience": "user-service",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ],
       "defaultClientScopes": [
+        "web-origins",
         "service_account",
-        "web-origins",
-        "acr",
-        "roles",
-        "profile",
-        "basic",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "organization",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
-      "id": "14e681c0-c085-4522-a6ae-e9901775a19e",
-      "clientId": "user-service-api",
-      "name": "user-service-api",
-      "description": "",
-      "rootUrl": "",
-      "adminUrl": "",
-      "baseUrl": "",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": false,
-      "clientAuthenticatorType": "client-secret",
-      "redirectUris": [
-        "/*"
-      ],
-      "webOrigins": [
-        "/*"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": false,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
-      "frontchannelLogout": true,
-      "protocol": "openid-connect",
-      "attributes": {
-        "realm_client": "false",
-        "oidc.ciba.grant.enabled": "false",
-        "backchannel.logout.session.required": "true",
-        "standard.token.exchange.enabled": "false",
-        "oauth2.device.authorization.grant.enabled": "false",
-        "backchannel.logout.revoke.offline.tokens": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "web-origins",
         "acr",
         "roles",
         "profile",
@@ -2977,7 +2541,7 @@
       "alias": "CONFIGURE_TOTP",
       "name": "Configure OTP",
       "providerId": "CONFIGURE_TOTP",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 10,
       "config": {}
@@ -2995,7 +2559,7 @@
       "alias": "UPDATE_PASSWORD",
       "name": "Update Password",
       "providerId": "UPDATE_PASSWORD",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 30,
       "config": {}
@@ -3004,7 +2568,7 @@
       "alias": "UPDATE_PROFILE",
       "name": "Update Profile",
       "providerId": "UPDATE_PROFILE",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 40,
       "config": {}
@@ -3013,7 +2577,7 @@
       "alias": "VERIFY_EMAIL",
       "name": "Verify Email",
       "providerId": "VERIFY_EMAIL",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 50,
       "config": {}
@@ -3031,7 +2595,7 @@
       "alias": "webauthn-register",
       "name": "Webauthn Register",
       "providerId": "webauthn-register",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 70,
       "config": {}
@@ -3040,7 +2604,7 @@
       "alias": "webauthn-register-passwordless",
       "name": "Webauthn Register Passwordless",
       "providerId": "webauthn-register-passwordless",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 80,
       "config": {}
@@ -3049,7 +2613,7 @@
       "alias": "VERIFY_PROFILE",
       "name": "Verify Profile",
       "providerId": "VERIFY_PROFILE",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 90,
       "config": {}
@@ -3058,7 +2622,7 @@
       "alias": "delete_credential",
       "name": "Delete Credential",
       "providerId": "delete_credential",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 100,
       "config": {}
@@ -3067,7 +2631,7 @@
       "alias": "idp_link",
       "name": "Linking Identity Provider",
       "providerId": "idp_link",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 110,
       "config": {}
@@ -3076,7 +2640,7 @@
       "alias": "CONFIGURE_RECOVERY_AUTHN_CODES",
       "name": "Recovery Authentication Codes",
       "providerId": "CONFIGURE_RECOVERY_AUTHN_CODES",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 120,
       "config": {}
@@ -3085,7 +2649,7 @@
       "alias": "update_user_locale",
       "name": "Update User Locale",
       "providerId": "update_user_locale",
-      "enabled": false,
+      "enabled": true,
       "defaultAction": false,
       "priority": 1000,
       "config": {}

@@ -2,8 +2,6 @@ package com.bookstore.order;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import io.restassured.RestAssured;
@@ -13,6 +11,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -28,6 +27,7 @@ import org.wiremock.integrations.testcontainers.WireMockContainer;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
 @Testcontainers
+@AutoConfigureWebTestClient
 public abstract class AbstractIT {
     private static final String REALM = "bookstore";
     private static final String CLIENT_ID = "user-service-admin";
@@ -66,7 +66,7 @@ public abstract class AbstractIT {
         RestAssured.port = port;
     }
 
-    protected String getAccessToken(String username, String password) throws JsonProcessingException {
+    protected String getAccessToken(String username, String password) {
         String tokenUrl = KEYCLOAK.getAuthServerUrl() + "/realms/" + REALM + "/protocol/openid-connect/token";
 
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
@@ -76,19 +76,16 @@ public abstract class AbstractIT {
         form.add("username", username);
         form.add("password", password);
 
-        String response = WebClient.builder()
+        Map<String, Object> tokenResponse = WebClient.builder()
                 .baseUrl(tokenUrl)
                 .build()
                 .post()
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData(form))
                 .retrieve()
-                .onStatus(status -> status.isError(), res -> res.bodyToMono(String.class)
-                        .map(body -> new RuntimeException("Keycloak error: " + body)))
-                .bodyToMono(String.class)
+                .bodyToMono(Map.class)
                 .block();
 
-        Map<String, Object> tokenResponse = new ObjectMapper().readValue(response, Map.class);
         if (tokenResponse == null || tokenResponse.get("access_token") == null) {
             throw new IllegalStateException("Could not obtain access token from Keycloak");
         }
