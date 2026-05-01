@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import io.restassured.RestAssured;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -17,8 +18,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-import java.util.Map;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -69,10 +68,8 @@ public abstract class AbstractIT {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData(form))
                 .retrieve()
-                .onStatus(status -> status.isError(), res ->
-                        res.bodyToMono(String.class)
-                                .map(body -> new RuntimeException("Keycloak error: " + body))
-                )
+                .onStatus(status -> status.isError(), res -> res.bodyToMono(String.class)
+                        .map(body -> new RuntimeException("Keycloak error: " + body)))
                 .bodyToMono(String.class)
                 .block();
 

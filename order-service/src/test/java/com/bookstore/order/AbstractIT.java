@@ -1,10 +1,14 @@
 package com.bookstore.order;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import io.restassured.RestAssured;
+import java.math.BigDecimal;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,11 +24,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.integrations.testcontainers.WireMockContainer;
-
-import java.math.BigDecimal;
-import java.util.Map;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
@@ -84,10 +83,8 @@ public abstract class AbstractIT {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData(form))
                 .retrieve()
-                .onStatus(status -> status.isError(), res ->
-                        res.bodyToMono(String.class)
-                                .map(body -> new RuntimeException("Keycloak error: " + body))
-                )
+                .onStatus(status -> status.isError(), res -> res.bodyToMono(String.class)
+                        .map(body -> new RuntimeException("Keycloak error: " + body)))
                 .bodyToMono(String.class)
                 .block();
 
