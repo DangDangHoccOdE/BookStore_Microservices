@@ -1,17 +1,10 @@
 package com.bookstore.order;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import io.restassured.RestAssured;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,9 +13,18 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.wiremock.integrations.testcontainers.WireMockContainer;
+
+import java.math.BigDecimal;
+import java.util.Map;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
@@ -65,36 +67,36 @@ public abstract class AbstractIT {
         RestAssured.port = port;
     }
 
-    protected String getAccessToken(String username, String password) {
+    protected String getAccessToken(String username, String password) throws JsonProcessingException {
         String tokenUrl = KEYCLOAK.getAuthServerUrl() + "/realms/" + REALM + "/protocol/openid-connect/token";
 
-        String body = "grant_type=password&client_id=" + CLIENT_ID + "&client_secret=" + CLIENT_SECRET + "&username="
-                + username + "&password=" + password;
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("grant_type", "password");
+        form.add("client_id", CLIENT_ID);
+        form.add("client_secret", CLIENT_SECRET);
+        form.add("username", username);
+        form.add("password", password);
 
-        try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(tokenUrl))
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
-                    .build();
+        String response = WebClient.builder()
+                .baseUrl(tokenUrl)
+                .build()
+                .post()
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData(form))
+                .retrieve()
+                .onStatus(status -> status.isError(), res ->
+                        res.bodyToMono(String.class)
+                                .map(body -> new RuntimeException("Keycloak error: " + body))
+                )
+                .bodyToMono(String.class)
+                .block();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() != 200) {
-                throw new IllegalStateException("Failed to get token: " + response.statusCode());
-            }
-
-            ObjectMapper mapper = new ObjectMapper();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> responseBody = mapper.readValue(response.body(), Map.class);
-            if (!responseBody.containsKey("access_token")) {
-                throw new IllegalStateException("Could not obtain access token from Keycloak");
-            }
-            return responseBody.get("access_token").toString();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get access token", e);
+        Map<String, Object> tokenResponse = new ObjectMapper().readValue(response, Map.class);
+        if (tokenResponse == null || tokenResponse.get("access_token") == null) {
+            throw new IllegalStateException("Could not obtain access token from Keycloak");
         }
+
+        return tokenResponse.get("access_token").toString();
     }
 
     protected static void mockGetProductByCode(String code, String name, BigDecimal price) {

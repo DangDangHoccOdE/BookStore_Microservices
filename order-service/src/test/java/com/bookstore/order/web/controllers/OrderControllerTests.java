@@ -7,6 +7,7 @@ import static org.hamcrest.CoreMatchers.is;
 import com.bookstore.order.AbstractIT;
 import com.bookstore.order.domain.models.OrderSummary;
 import com.bookstore.order.testdata.TestDataFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import java.math.BigDecimal;
@@ -21,7 +22,7 @@ class OrderControllerTests extends AbstractIT {
     @Nested
     class CreateOrderTests {
         @Test
-        void shouldCreateOrderSuccessfully() {
+        void shouldCreateOrderSuccessfully() throws JsonProcessingException {
             mockGetProductByCode("P100", "Product 1", new BigDecimal("25.50"));
             String token = getAccessToken("user12", "123");
 
@@ -62,7 +63,7 @@ class OrderControllerTests extends AbstractIT {
         }
 
         @Test
-        void shouldReturnBadRequestWhenMandatoryDataIsMissing() {
+        void shouldReturnBadRequestWhenMandatoryDataIsMissing() throws JsonProcessingException {
             String token = getAccessToken("user12", "123");
             var payload = TestDataFactory.createOrderRequestWithInvalidCustomer();
             given().contentType(ContentType.JSON)
@@ -79,7 +80,7 @@ class OrderControllerTests extends AbstractIT {
     @Sql(scripts = "classpath:/test-order.sql")
     class GetOrderTests {
         @Test
-        void shouldGetOrderSuccessfully() {
+        void shouldGetOrderSuccessfully() throws JsonProcessingException {
             String token = getAccessToken("user12", "123");
             List<OrderSummary> orderSummaries = given().header("Authorization", "Bearer " + token)
                     .when()
@@ -100,7 +101,7 @@ class OrderControllerTests extends AbstractIT {
         String orderNumber = "order-123";
 
         @Test
-        void shouldGetOrderSuccessfully() {
+        void shouldGetOrderSuccessfully() throws JsonProcessingException {
             String token = getAccessToken("user12", "123");
             given().header("Authorization", "Bearer " + token)
                     .when()

@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.is;
 
 import com.bookstore.catalog.AbstractIT;
 import com.bookstore.catalog.domain.Product;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.http.ContentType;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
@@ -16,8 +17,8 @@ import org.springframework.test.context.jdbc.Sql;
 class ProductControllerTest extends AbstractIT {
 
     @Test
-    void shouldReturnProducts() {
-        String token = getAccessToken("user12", "123");
+    void shouldReturnProducts() throws JsonProcessingException {
+        String token = getAccessToken("usertest", "usertest");
         given().contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -35,8 +36,8 @@ class ProductControllerTest extends AbstractIT {
     }
 
     @Test
-    void shouldGetProductByCode() {
-        String token = getAccessToken("user12", "123");
+    void shouldGetProductByCode() throws JsonProcessingException {
+        String token = getAccessToken("usertest", "usertest");
         Product product = given().contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -55,9 +56,9 @@ class ProductControllerTest extends AbstractIT {
     }
 
     @Test
-    void shouldReturnNotFoundWhenProductCodeNotExists() {
+    void shouldReturnNotFoundWhenProductCodeNotExists() throws JsonProcessingException {
         String code = "invalid_product_code";
-        String token = getAccessToken("user12", "123");
+        String token = getAccessToken("usertest", "usertest");
         given().contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
                 .when()
