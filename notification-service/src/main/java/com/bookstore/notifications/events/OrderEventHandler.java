@@ -57,16 +57,16 @@ public class OrderEventHandler {
                 // Push to DLQ
                 log.error("Send to FINAL DLQ eventId={}", eventId);
 
-                String dlqRoutingKey = switch (eventType) {
-                    case "OrderCreatedEvent" -> applicationProperties.newOrdersQueueDlq();
-                    case "OrderDeliveredEvent" -> applicationProperties.deliveredQueueDlq();
-                    case "OrderCancelledEvent" -> applicationProperties.cancelledQueueDlq();
-                    case "OrderErrorEvent" -> applicationProperties.errorQueueDlq();
-                    default -> throw new IllegalArgumentException("Unknown eventType");
-                };
+                String dlqRoutingKey =
+                        switch (eventType) {
+                            case "OrderCreatedEvent" -> applicationProperties.newOrdersQueueDlq();
+                            case "OrderDeliveredEvent" -> applicationProperties.deliveredQueueDlq();
+                            case "OrderCancelledEvent" -> applicationProperties.cancelledQueueDlq();
+                            case "OrderErrorEvent" -> applicationProperties.errorQueueDlq();
+                            default -> throw new IllegalArgumentException("Unknown eventType");
+                        };
 
-                rabbitTemplate.convertAndSend(
-                        applicationProperties.deadLetterExchange(), dlqRoutingKey, message);
+                rabbitTemplate.convertAndSend(applicationProperties.deadLetterExchange(), dlqRoutingKey, message);
 
                 channel.basicAck(tag, false);
             } else {
