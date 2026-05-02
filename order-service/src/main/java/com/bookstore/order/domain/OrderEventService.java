@@ -89,6 +89,9 @@ public class OrderEventService {
                 // Đã có job chạy để update về PENDING nếu PROCESSING quá lâu -> crash app
                 orderEventRepository.save(event);
 
+                System.out.println("================================");
+                log.info("Publishing eventId={}, eventType={}", event.getEventId(), event.getEventType());
+                System.out.println("================================");
                 publishEvent(event);
 
                 event.setStatus(OutboxStatus.PUBLISHED);

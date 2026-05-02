@@ -10,6 +10,16 @@ public record ApplicationProperties(
         String deliveredOrdersQueue,
         String cancelledOrdersQueue,
         String errorOrdersQueue,
+        String deadLetterExchange,
+        String newOrdersQueueRetry,
+        String newOrdersQueueDlq,
+        String deliveredQueueRetry,
+        String deliveredQueueDlq,
+        String cancelledQueueRetry,
+        String cancelledQueueDlq,
+        String errorQueueRetry,
+        String errorQueueDlq,
+        Long retryTtl,
         Keycloak keycloak) {
 
     public record Keycloak(String clientId) {}
