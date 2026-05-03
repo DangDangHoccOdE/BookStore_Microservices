@@ -24,6 +24,7 @@ public class GatewaySecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(ex -> ex.pathMatchers(
                                 "/actuator/health",
+                                "/actuator/prometheus",
                                 "/actuator/info",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",

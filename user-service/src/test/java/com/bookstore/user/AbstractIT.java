@@ -30,7 +30,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public abstract class AbstractIT {
     private static final String REALM = "bookstore";
     private static final String CLIENT_ID = "user-service-admin";
-    private static final String CLIENT_SECRET = "Su2ewBLfHmdmvFRE5qRruSu68oCgRHED";
+    private static final String CLIENT_SECRET = "HqbZthuP7SpE5mxinaMkGURIlrRFj1EC";
     private static final String REQUIRED_AUDIENCE = "user-service-api";
 
     @Container

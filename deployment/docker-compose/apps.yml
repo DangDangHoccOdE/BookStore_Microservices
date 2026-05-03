@@ -3,6 +3,8 @@ services:
     image: danghoang9704/bookstore-catalog-service
     container_name: catalog-service
     environment:
+      - BPL_JVM_THREAD_COUNT=50
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m -Xss512k
       - SPRING_PROFILES_ACTIVE=docker
       - DB_URL=jdbc:postgresql://catalog-db:5432/postgres
       - DB_USERNAME=postgres
@@ -12,6 +14,8 @@ services:
       - API_GATEWAY_URL=http://api-gateway:8989/catalog
       - CATALOG_SERVICE_URL=http://catalog-service:8081
       - KEYCLOAK_API_CLIENT_ID=user-service-admin
+      - MANAGEMENT_TRACING_ENABLED=true
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
     ports:
       - "8081:8081"
     restart: unless-stopped
@@ -22,11 +26,15 @@ services:
       resources:
         limits:
           memory: 700m
+    labels:
+      logging: "promtail"
 
   order-service:
     image: danghoang9704/bookstore-order-service
     container_name: order-service
     environment:
+        - BPL_JVM_THREAD_COUNT=50
+        - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m -Xss512k
         - SPRING_PROFILES_ACTIVE=docker
         - ORDERS_CATALOG_SERVICE_URL=http://api-gateway:8989/catalog
         - DB_URL=jdbc:postgresql://orders-db:5432/postgres
@@ -40,6 +48,8 @@ services:
         - JWT_REQUIRED_AUDIENCE=order-service-api
         - KEYCLOAK_API_CLIENT_ID=user-service-admin
         - API_GATEWAY_URL=http://api-gateway:8989/orders
+        - MANAGEMENT_TRACING_ENABLED=true
+        - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
     ports:
       - "8082:8082"
     restart: unless-stopped
@@ -54,11 +64,15 @@ services:
       resources:
         limits:
           memory: 700m
+    labels:
+      logging: "promtail"
 
   notification-service:
     image: danghoang9704/bookstore-notification-service
     container_name: notification-service
     environment:
+      - BPL_JVM_THREAD_COUNT=50
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m -Xss512k
       - SPRING_PROFILES_ACTIVE=docker
       - DB_URL=jdbc:postgresql://notifications-db:5432/postgres
       - DB_USERNAME=postgres
@@ -69,6 +83,8 @@ services:
       - RABBITMQ_PASSWORD=guest
       - MAIL_HOST=mailhog
       - MAIL_PORT=1025
+      - MANAGEMENT_TRACING_ENABLED=true
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
     ports:
       - "8083:8083"
     restart: unless-stopped
@@ -79,11 +95,19 @@ services:
         condition: service_healthy
       mailhog:
         condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    labels:
+      logging: "promtail"
 
   api-gateway:
     image: danghoang9704/bookstore-api-gateway
     container_name: api-gateway
     environment:
+      - BPL_JVM_THREAD_COUNT=50
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m -Xss512k
       - SPRING_PROFILES_ACTIVE=docker
       - CATALOG_SERVICE_URL=http://catalog-service:8081
       - ORDER_SERVICE_URL=http://order-service:8082
@@ -92,6 +116,8 @@ services:
       - REDIS_PORT=6379
       - KEYCLOAK_ISSUER_URI=http://keycloak:9191/realms/bookstore
       - JWT_REQUIRED_AUDIENCE=api-gateway
+      - MANAGEMENT_TRACING_ENABLED=true
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
     ports:
       - "8989:8989"
     restart: unless-stopped
@@ -102,7 +128,7 @@ services:
         condition: service_started
       user-service:
         condition: service_started
-      bookstore-redis:
+      redis:
         condition: service_healthy
       keycloak:
         condition: service_started
@@ -110,11 +136,15 @@ services:
       resources:
         limits:
           memory: 700m
+    labels:
+      logging: "promtail"
 
   user-service:
     image: danghoang9704/bookstore-user-service
     container_name: user-service
     environment:
+      - BPL_JVM_THREAD_COUNT=50
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m -Xss512k
       - SPRING_PROFILES_ACTIVE=docker
       - DB_URL=jdbc:postgresql://users-db:5432/postgres
       - DB_USERNAME=postgres
@@ -125,8 +155,10 @@ services:
       - JWT_REQUIRED_AUDIENCE=user-service-api
       - KEYCLOAK_API_CLIENT_ID=user-service-api
       - KEYCLOAK_ADMIN_CLIENT_ID=user-service-admin
-      - KEYCLOAK_ADMIN_CLIENT_SECRET=Su2ewBLfHmdmvFRE5qRruSu68oCgRHED
+      - KEYCLOAK_ADMIN_CLIENT_SECRET=HqbZthuP7SpE5mxinaMkGURIlrRFj1EC
       - API_GATEWAY_URL=http://api-gateway:8989/users
+      - MANAGEMENT_TRACING_ENABLED=true
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
     ports:
       - "8084:8084"
     restart: unless-stopped
@@ -139,3 +171,5 @@ services:
       resources:
         limits:
           memory: 700m
+    labels:
+      logging: "promtail"
