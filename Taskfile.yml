@@ -8,6 +8,7 @@ vars:
   APP_DC_FILE: "{{.DC_DIR}}/apps.yml"
   SLEEP_CMD: '{{if eq .GOOS "windows"}}timeout{{else}}sleep{{end}}'
   MONITORING_DC_FILE: "{{.DC_DIR}}/monitoring.yml"
+  TAG: "{{default \"latest\" .TAG}}"
 
 tasks:
   default:
@@ -24,11 +25,11 @@ tasks:
 
   build:
     cmds:
-      - "{{.MVNW}} -pl catalog-service spring-boot:build-image -DskipTests"
-      - "{{.MVNW}} -pl order-service spring-boot:build-image -DskipTests"
-      - "{{.MVNW}} -pl notification-service spring-boot:build-image -DskipTests"
-      - "{{.MVNW}} -pl api-gateway spring-boot:build-image -DskipTests"
-      - "{{.MVNW}} -pl user-service spring-boot:build-image -DskipTests"
+      - "{{.MVNW}} -pl catalog-service spring-boot:build-image -DskipTests -DdockerImageTag={{.TAG}}"
+      - "{{.MVNW}} -pl order-service spring-boot:build-image -DskipTests -DdockerImageTag={{.TAG}}"
+      - "{{.MVNW}} -pl notification-service spring-boot:build-image -DskipTests -DdockerImageTag={{.TAG}}"
+      - "{{.MVNW}} -pl api-gateway spring-boot:build-image -DskipTests -DdockerImageTag={{.TAG}}"
+      - "{{.MVNW}} -pl user-service spring-boot:build-image -DskipTests -DdockerImageTag={{.TAG}}"
 
   start_infra:
     cmds:
