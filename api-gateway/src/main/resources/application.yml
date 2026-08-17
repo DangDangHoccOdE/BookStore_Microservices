@@ -63,6 +63,18 @@ spring:
                     redis-rate-limiter.burstCapacity: 20
                     key-resolver: "#{@principalOrIpKeyResolver}"
 
+            - id: analytics-service
+              uri: ${ANALYTICS_SERVICE_URL:http://localhost:8085}
+              predicates:
+                - Path=/analytics/**
+              filters:
+                - RewritePath=/analytics/?(?<segment>.*), /${segment}
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    key-resolver: "#{@principalOrIpKeyResolver}"
+
 #            - id: openapi
 #              uri: http://localhost:${server.port}
 #              predicates:

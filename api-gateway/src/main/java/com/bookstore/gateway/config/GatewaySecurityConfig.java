@@ -39,6 +39,8 @@ public class GatewaySecurityConfig {
                                 "/orders/v3/api-docs/**",
                                 "/catalog/v3/api-docs",
                                 "/catalog/v3/api-docs/**",
+                                "/analytics/v3/api-docs",
+                                "/analytics/v3/api-docs/**",
 
                                 // public register through gateway
                                 "/users/api/users/register")

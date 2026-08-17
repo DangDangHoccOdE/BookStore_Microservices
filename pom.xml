@@ -24,6 +24,7 @@
         <module>notification-service</module>
         <module>api-gateway</module>
         <module>user-service</module>
+        <module>analytics-service</module>
     </modules>
 
     <build>

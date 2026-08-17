@@ -30,6 +30,7 @@ tasks:
       - "{{.MVNW}} -pl notification-service spring-boot:build-image -DskipTests -DdockerImageTag={{.TAG}}"
       - "{{.MVNW}} -pl api-gateway spring-boot:build-image -DskipTests -DdockerImageTag={{.TAG}}"
       - "{{.MVNW}} -pl user-service spring-boot:build-image -DskipTests -DdockerImageTag={{.TAG}}"
+      - "{{.MVNW}} -pl analytics-service spring-boot:build-image -DskipTests -DdockerImageTag={{.TAG}}"
 
   start_infra:
     cmds:

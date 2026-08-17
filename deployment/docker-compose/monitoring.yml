@@ -1,3 +1,5 @@
+name: 'BookStore-Microservices'
+
 services:
   prometheus:
     image: prom/prometheus:v2.51.2
@@ -46,6 +48,22 @@ services:
       - "9411:9411"     # Zipkin
     volumes:
       - ./tempo/tempo.yml:/etc/tempo-config.yml
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:v1.8.0
+    container_name: kafka-exporter
+    command:
+      - "--kafka.server=bookstore-kafka:29092"
+    ports:
+      - "9308:9308"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 300m
+    depends_on:
+    - bookstore-kafka
+
 volumes:
   grafana_data: {}
 

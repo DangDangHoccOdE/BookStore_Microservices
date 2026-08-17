@@ -20,7 +20,10 @@ public record ApplicationProperties(
         String errorQueueRetry,
         String errorQueueDlq,
         Long retryTtl,
-        Keycloak keycloak) {
+        Keycloak keycloak,
+        Kafka kafka) {
 
     public record Keycloak(String clientId) {}
+
+    public record Kafka(String orderEventsTopic) {}
 }

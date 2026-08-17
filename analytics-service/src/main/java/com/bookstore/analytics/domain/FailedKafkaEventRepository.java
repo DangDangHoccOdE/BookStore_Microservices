@@ -1,4 +1,5 @@
 package com.bookstore.analytics.domain;
 
-public class FailedKafkaEventRepository {
-}
+import org.springframework.data.jpa.repository.JpaRepository;
+
+interface FailedKafkaEventRepository extends JpaRepository<FailedKafkaEventEntity, Long> {}

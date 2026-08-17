@@ -50,6 +50,7 @@ services:
         - API_GATEWAY_URL=http://api-gateway:8989/orders
         - MANAGEMENT_TRACING_ENABLED=true
         - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
+        - KAFKA_BOOTSTRAP_SERVERS=bookstore-kafka:29092
     ports:
       - "8082:8082"
     restart: unless-stopped
@@ -60,6 +61,8 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_started
+      bookstore-kafka:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -112,6 +115,7 @@ services:
       - CATALOG_SERVICE_URL=http://catalog-service:8081
       - ORDER_SERVICE_URL=http://order-service:8082
       - USER_SERVICE_URL=http://user-service:8084
+      - ANALYTICS_SERVICE_URL=http://analytics-service:8085
       - REDIS_HOST=bookstore-redis
       - REDIS_PORT=6379
       - KEYCLOAK_ISSUER_URI=http://keycloak:9191/realms/bookstore
@@ -127,6 +131,8 @@ services:
       order-service:
         condition: service_started
       user-service:
+        condition: service_started
+      analytics-service:
         condition: service_started
       redis:
         condition: service_healthy
@@ -167,6 +173,40 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    labels:
+      logging: "promtail"
+      
+  analytics-service:
+    image: danghoang9704/bookstore-analytics-service
+    container_name: analytics-service
+    environment:
+      - BPL_JVM_THREAD_COUNT=50
+      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m -Xss512k
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:postgresql://analytics-db:5432/postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - KEYCLOAK_ISSUER_URI=http://keycloak:9191/realms/bookstore
+      - JWT_REQUIRED_AUDIENCE=analytics-service-api
+      - KEYCLOAK_API_CLIENT_ID=user-service-admin
+      - API_GATEWAY_URL=http://api-gateway:8989/analytics
+      - MANAGEMENT_TRACING_ENABLED=true
+      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
+      - KAFKA_BOOTSTRAP_SERVERS=bookstore-kafka:29092
+      - KAFKA_CONSUMER_GROUP_ID=analytics-group
+      - ORDER_EVENTS_TOPIC=order.events
+    ports:
+      - "8085:8085"
+    restart: unless-stopped
+    depends_on:
+      analytics-db:
+        condition: service_healthy
+      bookstore-kafka:
+        condition: service_healthy
     deploy:
       resources:
         limits:

@@ -1,4 +1,5 @@
 package com.bookstore.analytics.web;
 
-public class AnalyticsResetResponse {
-}
+import java.time.LocalDateTime;
+
+public record AnalyticsResetResponse(String message, int deletedProcessedEvents, LocalDateTime resetAt) {}

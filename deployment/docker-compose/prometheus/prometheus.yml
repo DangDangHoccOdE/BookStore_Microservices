@@ -39,3 +39,15 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['user-service:8084']
+
+  - job_name: 'analytics-service'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['analytics-service:8085']
+
+  - job_name: 'kafka-exporter'
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['kafka-exporter:9308']

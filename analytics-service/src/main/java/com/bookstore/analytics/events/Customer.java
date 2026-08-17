@@ -1,4 +1,3 @@
 package com.bookstore.analytics.events;
 
-public class deliveryAddress {
-}
+public record Customer(String name, String email, String phone) {}

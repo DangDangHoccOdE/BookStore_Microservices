@@ -18,6 +18,7 @@ public class OrderEventService {
 
     private final OrderEventRepository orderEventRepository;
     private final OrderEventPublisher orderEventPublisher;
+    private final KafkaOrderEventPublisher kafkaOrderEventPublisher;
     private final ObjectMapper objectMapper;
 
     @Value("${orders.outbox.max-retry}")
@@ -26,9 +27,11 @@ public class OrderEventService {
     OrderEventService(
             OrderEventRepository orderEventRepository,
             OrderEventPublisher orderEventPublisher,
+            KafkaOrderEventPublisher kafkaOrderEventPublisher,
             ObjectMapper objectMapper) {
         this.orderEventRepository = orderEventRepository;
         this.orderEventPublisher = orderEventPublisher;
+        this.kafkaOrderEventPublisher = kafkaOrderEventPublisher;
         this.objectMapper = objectMapper;
     }
 
@@ -72,11 +75,6 @@ public class OrderEventService {
         this.orderEventRepository.save(orderEvent);
     }
 
-    //    lấy batch PENDING
-    //    mark thành PROCESSING
-    //    publish từng event
-    //    publish xong thì mark PUBLISHED
-    //    nếu lỗi thì mark FAILED và tăng retry
     public void publishOrderEvents() {
         List<OrderEventEntity> events = orderEventRepository.lockPendingEvents(50);
         log.info("Found {} Order Events to be published", events.size());
@@ -86,12 +84,9 @@ public class OrderEventService {
                 event.setStatus(OutboxStatus.PROCESSING);
                 event.setLockedAt(LocalDateTime.now());
                 event.setLockedBy("order-service");
-                // Đã có job chạy để update về PENDING nếu PROCESSING quá lâu -> crash app
                 orderEventRepository.save(event);
 
-                System.out.println("================================");
                 log.info("Publishing eventId={}, eventType={}", event.getEventId(), event.getEventType());
-                System.out.println("================================");
                 publishEvent(event);
 
                 event.setStatus(OutboxStatus.PUBLISHED);
@@ -99,7 +94,6 @@ public class OrderEventService {
             } catch (Exception e) {
                 event.setRetryCount(event.getRetryCount() + 1);
 
-                // set biến này để cho phép gửi lại
                 if (event.getRetryCount() < maxRetry) {
                     event.setStatus(OutboxStatus.PENDING);
                 } else {
@@ -115,10 +109,12 @@ public class OrderEventService {
 
     private void publishEvent(OrderEventEntity orderEvent) {
         OrderEventType orderEventType = orderEvent.getEventType();
+
         switch (orderEventType) {
             case ORDER_CREATED:
                 OrderCreatedEvent orderCreatedEvent = fromJsonPayload(orderEvent.getPayload(), OrderCreatedEvent.class);
                 orderEventPublisher.publish(orderCreatedEvent);
+                kafkaOrderEventPublisher.publish(orderCreatedEvent);
                 break;
             case ORDER_DELIVERED:
                 OrderDeliveredEvent orderDeliveredEvent =
