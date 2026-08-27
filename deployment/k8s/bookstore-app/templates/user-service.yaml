@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  labels:
+    {{- include "bookstore.labels" . | nindent 4 }}
+    service: user-service
+spec:
+  replicas: {{ .Values.userService.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      service: user-service
+  template:
+    metadata:
+      labels:
+        service: user-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: {{ .Values.userService.port | quote }}
+    spec:
+      containers:
+        - name: user-service
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.global.imageUsername }}/bookstore-user-service:{{ .Values.global.imageTag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy | default "Always" }}
+          ports:
+            - containerPort: {{ .Values.userService.port }}
+          env:
+            - name: DB_URL
+              value: "{{ .Values.userService.dbUrl }}"
+            - name: JWT_REQUIRED_AUDIENCE
+              value: "user-service-api"
+            - name: KEYCLOAK_SERVER_URL
+              value: "{{ .Values.userService.keycloakServerUrl }}"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bookstore-secrets
+                  key: database-password
+            - name: KEYCLOAK_ADMIN_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bookstore-secrets
+                  key: keycloak-admin-client-secret
+            - name: SPRING_LIFECYCLE_TIMEOUT_PER_SHUTDOWN_PHASE
+              value: {{ .Values.lifecycle.timeoutPerShutdownPhase | quote }}
+            - name: SERVER_SHUTDOWN
+              value: "graceful"
+          envFrom:
+            - configMapRef:
+                name: bookstore-configmap
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep {{ .Values.lifecycle.preStopSleepSeconds }}"]
+          resources:
+            {{- toYaml .Values.userService.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.userService.port }}
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.userService.port }}
+            initialDelaySeconds: 45
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  ports:
+    - port: {{ .Values.userService.port }}
+      targetPort: {{ .Values.userService.port }}
+  selector:
+    service: user-service

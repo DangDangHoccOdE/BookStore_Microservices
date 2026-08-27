@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bookstore-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    # Cho phép sử dụng regex trong các đường dẫn
+    {{- if .Values.global.tls.enabled }}
+    cert-manager.io/cluster-issuer: {{ .Values.global.tls.certIssuer | quote }}
+    # Sử dụng cert-manager để tự động cấp chứng chỉ SSL
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # Tự động chuyển đổi từ http -> https
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.global.ingressClassName | quote }}
+  # Nếu muốn sử dụng Ingress Controller khác, hãy thay đổi giá trị này. Ví dụ: "nginx", "traefik", "haproxy", "istio", v.v.
+  {{- if .Values.global.tls.enabled }}
+  tls:
+    - hosts:
+      - {{ .Values.global.apiGatewayHost | quote }}
+      - {{ .Values.global.keycloakHost | quote }}
+      # Danh sách các host cần cấp chứng chỉ SSL
+      secretName: {{ .Values.global.tls.secretName | quote }}
+      # Tên secret chứa chứng chỉ SSL
+  {{- end }}
+  rules:
+    - host: "bookstore.local"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: {{ .Values.apiGateway.port }}
+    - host: "keycloak.local"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 9191

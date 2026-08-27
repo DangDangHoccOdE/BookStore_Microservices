@@ -1,0 +1,87 @@
+{{- if .Values.kafka.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+# Dùng statefullSet vì Kafka cần lưu trữ dữ liệu và có thể cần nhiều bản sao để đảm bảo tính sẵn sàng và khả năng chịu lỗi.
+metadata:
+  name: kafka
+spec:
+  serviceName: kafka # StatefulSet cần một service để quản lý các pod của nó. Service này sẽ cung cấp DNS cho các pod Kafka.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka # StatefulSet sẽ quản lý các pod có nhãn "app: kafka"
+  template:
+    metadata:
+      labels:
+        app: kafka # Các pod Kafka sẽ có nhãn "app: kafka"
+    spec:
+      containers:
+        - name: kafka
+          image: {{ .Values.kafka.image }}
+          ports:
+            - containerPort: 9092
+            - containerPort: 29092
+          env:
+            - name: KAFKA_NODE_ID
+              value: "1"
+            - name: KAFKA_PROCESS_ROLES
+              value: "broker,controller"
+            - name: KAFKA_LISTENERS # Kafka lắng nghe các kết nối từ bên ngoài và bên trong cluster
+              value: "PLAINTEXT://:29092,PLAINTEXT_HOST://:9092,CONTROLLER://:9093"
+            - name: KAFKA_ADVERTISED_LISTENERS # Sau khi kết nối với tôi, nếu muốn tiếp tục giao tiếp thì hãy sử dụng địa chỉ này
+              value: "PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092"
+            - name: KAFKA_CONTROLLER_LISTENER_NAMES # Kafka sẽ sử dụng listener nào để giao tiếp với các broker khác
+              value: "CONTROLLER"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP # Kafka sẽ sử dụng giao thức bảo mật nào cho từng listener
+              value: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT"
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME # Kafka sẽ sử dụng listener nào để giao tiếp với các broker khác
+              value: "PLAINTEXT"
+            - name: KAFKA_CONTROLLER_QUORUM_VOTERS # Danh sách các broker sẽ tham gia vào quorum của controller
+              value: "1@127.0.0.1:9093"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR # Số lượng bản sao của topic __consumer_offsets
+              value: "1"
+            - name: KAFKA_NUM_PARTITIONS # Số lượng phân vùng mặc định cho các topic mới
+              value: "3"
+            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE # Có tự động tạo topic mới khi có producer gửi dữ liệu đến topic chưa tồn tại không
+              value: "false"
+            # Bổ sung biến dưới đây (giá trị là chuỗi base64 ngẫu nhiên dài 22 ký tự)
+            - name: KAFKA_CLUSTER_ID
+              value: "4L62xns2TseY75h1AtuNJA"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /var/lib/kafka/data
+  volumeClaimTemplates:
+    - metadata:
+        name: kafka-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.kafka.storageSize }}
+---
+apiVersion: v1
+kind: Service
+# Service tạo DNS
+metadata:
+  name: kafka
+spec:
+  ports:
+    - name: external
+      port: 9092
+    - name: internal
+      port: 29092
+  selector:
+    app: kafka
+  {{- end }}

@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-service
+  labels:
+    {{- include "bookstore.labels" . | nindent 4 }}
+    service: analytics-service
+spec:
+  replicas: {{ .Values.analyticsService.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      service: analytics-service
+  template:
+    metadata:
+      labels:
+        service: analytics-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: {{ .Values.analyticsService.port | quote }}
+    spec:
+      containers:
+        - name: analytics-service
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.global.imageUsername }}/bookstore-analytics-service:{{ .Values.global.imageTag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy | default "Always" }}
+          ports:
+            - containerPort: {{ .Values.analyticsService.port }}
+          env:
+            - name: DB_URL
+              value: "{{ .Values.analyticsService.dbUrl }}"
+            - name: JWT_REQUIRED_AUDIENCE
+              value: "analytics-service-api"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bookstore-secrets
+                  key: database-password
+            - name: SPRING_LIFECYCLE_TIMEOUT_PER_SHUTDOWN_PHASE
+              value: {{ .Values.lifecycle.timeoutPerShutdownPhase | quote }}
+            - name: SERVER_SHUTDOWN
+              value: "graceful"
+          envFrom:
+            - configMapRef:
+                name: bookstore-configmap
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep {{ .Values.lifecycle.preStopSleepSeconds }}"]
+          resources:
+            {{- toYaml .Values.analyticsService.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.analyticsService.port }}
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.analyticsService.port }}
+            initialDelaySeconds: 45
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-service
+spec:
+  ports:
+    - port: {{ .Values.analyticsService.port }}
+      targetPort: {{ .Values.analyticsService.port }}
+  selector:
+    service: analytics-service

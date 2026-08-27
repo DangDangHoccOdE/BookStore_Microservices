@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: {{ .Values.keycloak.image }}
+          # Tự động chuyển mode arguments
+          {{- if eq .Values.keycloak.mode "prod" }}
+          args: ["start", "--import-realm", "--http-port=9191"]
+          {{- else }}
+          args: ["start-dev", "--import-realm", "--http-port=9191"]
+          {{- end }}
+          ports:
+            - containerPort: 9191
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: {{ .Values.keycloak.adminUser | quote }}
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: {{ .Values.keycloak.adminPassword | quote }}
+            - name: KC_HOSTNAME
+              value: {{ .Values.keycloak.hostname | quote }}
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
+            - name: KC_HTTP_ENABLED
+              value: "true"
+            # Bổ sung dòng cấu hình này để fix lỗi ERR_TOO_MANY_REDIRECTS
+            - name: KC_PROXY
+              value: "edge"
+          # Biến cấu hình DB khi chạy Production
+          {{- if eq .Values.keycloak.mode "prod" }}
+          - name: KC_DB
+            value: "postgres"
+          - name: KC_DB_URL
+            value: "jdbc:postgresql://{{ .Values.keycloak.prodDb.host }}:{{ .Values.keycloak.prodDb.port }}/{{ .Values.keycloak.prodDb.name }}"
+          - name: KC_DB_USERNAME
+            value: {{ .Values.keycloak.prodDb.user | quote }}
+          - name: KC_DB_PASSWORD
+            value: {{ .Values.keycloak.prodDb.password | quote }}
+          {{- end }}
+          resources:
+            requests:
+              cpu: 300m
+              memory: 512Mi
+            limits:
+              cpu: 600m
+              memory: 1Gi
+          readinessProbe:
+            tcpSocket:
+              port: 9191
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+spec:
+  ports:
+    - port: 9191
+      targetPort: 9191
+  selector:
+    app: keycloak

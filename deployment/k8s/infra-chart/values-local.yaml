@@ -1,0 +1,28 @@
+postgres:
+  enabled: true
+  image: postgres:16-alpine
+  user: postgres
+  password: superSecurePassword123
+  storageSize: 2Gi
+
+redis:
+  image: redis:7-alpine
+
+rabbitmq:
+  enabled: true
+  image: rabbitmq:3.12-management
+  user: guest
+  pass: guest
+  storageSize: 1Gi
+
+kafka:
+  enabled: true
+  image: apache/kafka:4.3.1
+  storageSize: 2Gi
+
+keycloak:
+  image: quay.io/keycloak/keycloak:26.3.0
+  mode: dev
+  adminUser: admin
+  adminPassword: adminPassword123
+  hostname: keycloak.local

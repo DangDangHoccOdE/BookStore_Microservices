@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  labels:
+    {{- include "bookstore.labels" . | nindent 4 }}
+    service: notification-service
+spec:
+  replicas: {{ .Values.notificationService.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      service: notification-service
+  template:
+    metadata:
+      labels:
+        service: notification-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: {{ .Values.notificationService.port | quote }}
+    spec:
+      containers:
+        - name: notification-service
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.global.imageUsername }}/bookstore-notification-service:{{ .Values.global.imageTag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy | default "Always" }}
+          ports:
+            - containerPort: {{ .Values.notificationService.port }}
+          env:
+            - name: DB_URL
+              value: "{{ .Values.notificationService.dbUrl }}"
+            - name: JWT_REQUIRED_AUDIENCE
+              value: "notification-service-api"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bookstore-secrets
+                  key: database-password
+            - name: SPRING_LIFECYCLE_TIMEOUT_PER_SHUTDOWN_PHASE
+              value: {{ .Values.lifecycle.timeoutPerShutdownPhase | quote }}
+            - name: SERVER_SHUTDOWN
+              value: "graceful"
+          envFrom:
+            - configMapRef:
+                name: bookstore-configmap
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep {{ .Values.lifecycle.preStopSleepSeconds }}"]
+          resources:
+            {{- toYaml .Values.notificationService.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.notificationService.port }}
+            initialDelaySeconds: 45
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.notificationService.port }}
+            initialDelaySeconds: 45
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+spec:
+  ports:
+    - port: {{ .Values.notificationService.port }}
+      targetPort: {{ .Values.notificationService.port }}
+  selector:
+    service: notification-service

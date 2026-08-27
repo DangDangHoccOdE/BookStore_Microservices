@@ -1,0 +1,124 @@
+global:
+  imageRegistry: "docker.io"
+  imageUsername: "danghoang9704"
+  imageTag: "" # Sẽ inject qua deploy script
+  keycloakIssuer: "http://keycloak.local/realms/bookstore" # Sử dụng HTTP
+  apiGatewayUrl: "http://bookstore.local" # Sử dụng HTTP
+  ingressClassName: "nginx"
+  imagePullPolicy: "Always"
+
+  # Cấu hình Hostname dùng chung để trỏ file hosts local về IP GKE
+  apiGatewayHost: "bookstore.local"
+  keycloakHost: "keycloak.local"
+
+  # TẮT TLS trên GKE
+  tls:
+    enabled: false
+    secretName: "bookstore-tls-prod-secret"
+    certIssuer: ""
+
+tracing:
+  enabled: "false"
+  zipkinEndpoint: "http://tempo:9411"
+
+lifecycle:
+  timeoutPerShutdownPhase: "30s"
+  preStopSleepSeconds: 15
+
+apiGateway:
+  replicaCount: 2
+  port: 8989
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+catalogService:
+  replicaCount: 2
+  port: 8081
+  dbUrl: "jdbc:postgresql://postgres:5432/catalog_db"
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 600m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+orderService:
+  replicaCount: 2
+  port: 8082
+  dbUrl: "jdbc:postgresql://postgres:5432/orders_db"
+  catalogServiceUrl: "http://catalog-service:8081"
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 600m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+userService:
+  replicaCount: 2
+  port: 8084
+  dbUrl: "jdbc:postgresql://postgres:5432/users_db"
+  keycloakServerUrl: "http://keycloak:9191"
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  autoscaling:
+    enabled: false
+
+notificationService:
+  replicaCount: 1
+  port: 8083
+  dbUrl: "jdbc:postgresql://postgres:5432/notifications_db"
+  resources:
+    requests:
+      cpu: 150m
+      memory: 256Mi
+    limits:
+      cpu: 400m
+      memory: 512Mi
+  autoscaling:
+    enabled: false
+
+analyticsService:
+  replicaCount: 1
+  port: 8085
+  dbUrl: "jdbc:postgresql://postgres:5432/analytics_db"
+  resources:
+    requests:
+      cpu: 150m
+      memory: 256Mi
+    limits:
+      cpu: 400m
+      memory: 512Mi
+  autoscaling:
+    enabled: false
+
+secrets:
+  databasePassword: "superSecurePassword123"
+  keycloakAdminClientSecret: "HqbZthuP7SpE5mxinaMkGURIlrRFj1EC"

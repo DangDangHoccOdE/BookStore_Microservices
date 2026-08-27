@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: bookstore-local-certificate
+spec:
+  secretName: {{ .Values.global.tls.secretName | quote }}
+
+  issuerRef:
+    name: {{ .Values.global.tls.certIssuer | quote }}
+    kind: ClusterIssuer
+
+  dnsNames:
+    - {{ .Values.global.apiGatewayHost | quote }}
+    - {{ .Values.global.keycloakHost | quote }}

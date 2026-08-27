@@ -1,0 +1,36 @@
+# Bật Postgres tự chạy StatefulSet trong cụm GKE
+postgres:
+  enabled: true
+  image: postgres:16-alpine
+  user: postgres
+  password: superSecurePassword123 # Dùng chung mật khẩu với local
+  storageSize: 5Gi # Dung lượng ổ đĩa ảo PVC trên GKE
+
+redis:
+  image: redis:7-alpine
+
+rabbitmq:
+  enabled: true
+  image: rabbitmq:3-12-management
+  user: prodAdminRabbit
+  pass: prodSecretPassRabbit999
+  storageSize: 5Gi
+
+kafka:
+  enabled: true
+  image: apache/kafka:4.3.1
+  storageSize: 10Gi
+
+keycloak:
+  image: quay.io/keycloak/keycloak:26.3.0
+  mode: prod # Sử dụng chế độ prod
+  adminUser: prodKeycloakAdmin
+  adminPassword: superComplexPassWordForProdAdmin
+  hostname: keycloak.local # Dùng chung domain giả lập với local
+  # Kết nối Keycloak vào database Postgres chạy trong cụm GKE để lưu trữ vĩnh viễn dữ liệu
+  prodDb:
+    host: "postgres"
+    port: "5432"
+    name: "keycloak_db"
+    user: "postgres"
+    password: "superSecurePassword123"

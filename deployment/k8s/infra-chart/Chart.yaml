@@ -1,0 +1,15 @@
+# Định nghĩa phiên bản cấu hình của Helm (v2 là chuẩn bắt buộc cho Helm v3)
+apiVersion: v2
+
+# Tên của Helm Chart & mô tả
+name: infra-chart
+description: Helm Chart managing Database, Cache, Brokers, and IAM for BookStore
+
+# Phân loại Chart: 'application' là ứng dụng có thể deploy trực tiếp lên Kubernetes
+type: application
+
+# Phiên bản của chính gói cấu hình Helm này
+version: 0.1.0
+
+# Phiên bản của phần mềm/hệ thống gốc bên
+appVersion: "1.0.0"

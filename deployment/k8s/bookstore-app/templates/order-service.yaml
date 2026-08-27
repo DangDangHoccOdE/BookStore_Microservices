@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  labels:
+    {{- include "bookstore.labels" . | nindent 4 }}
+    service: order-service
+spec:
+  replicas: {{ .Values.orderService.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      service: order-service
+  template:
+    metadata:
+      labels:
+        service: order-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: {{ .Values.orderService.port | quote }}
+    spec:
+      containers:
+        - name: order-service
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.global.imageUsername }}/bookstore-order-service:{{ .Values.global.imageTag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy | default "Always" }}
+          ports:
+            - containerPort: {{ .Values.orderService.port }}
+          env:
+            - name: DB_URL
+              value: "{{ .Values.orderService.dbUrl }}"
+            - name: JWT_REQUIRED_AUDIENCE
+              value: "order-service-api"
+            - name: ORDERS_CATALOG_SERVICE_URL
+              value: "{{ .Values.orderService.catalogServiceUrl }}"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bookstore-secrets
+                  key: database-password
+            - name: SPRING_LIFECYCLE_TIMEOUT_PER_SHUTDOWN_PHASE
+              value: {{ .Values.lifecycle.timeoutPerShutdownPhase | quote }}
+            - name: SERVER_SHUTDOWN
+              value: "graceful"
+          envFrom:
+            - configMapRef:
+                name: bookstore-configmap
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep {{ .Values.lifecycle.preStopSleepSeconds }}"]
+          resources:
+            {{- toYaml .Values.orderService.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.orderService.port }}
+            initialDelaySeconds: 40
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.orderService.port }}
+            initialDelaySeconds: 40
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+spec:
+  ports:
+    - port: {{ .Values.orderService.port }}
+      targetPort: {{ .Values.orderService.port }}
+  selector:
+    service: order-service
