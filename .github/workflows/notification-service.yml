@@ -53,6 +53,7 @@ jobs:
 
       - if: ${{ github.ref == 'refs/heads/main' }}
         name: Update Image Tag in Git & Push (GitOps Flow)
+        working-directory: .
         run: |
           # Cài đặt cấu hình Git Bot
           git config user.name "github-actions[bot]"
