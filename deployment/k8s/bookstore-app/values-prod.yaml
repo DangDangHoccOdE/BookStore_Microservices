@@ -112,7 +112,7 @@ notificationService:
 analyticsService:
   replicaCount: 1
   port: 8085
-  imageTag: "latest"
+  imageTag: "e5ed893"
   dbUrl: "jdbc:postgresql://postgres:5432/analytics_db"
   resources:
     requests:
