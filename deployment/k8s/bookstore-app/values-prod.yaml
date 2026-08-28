@@ -6,6 +6,11 @@ global:
   ingressClassName: "nginx"
   imagePullPolicy: "Always"
 
+  hostAliases:
+    - ip: "34.118.227.230" # IP dịch vụ Keycloak nội bộ trên GKE
+      hostnames:
+        - "keycloak.local"
+
   # Cấu hình Hostname dùng chung để trỏ file hosts local về IP GKE
   apiGatewayHost: "bookstore.local"
   keycloakHost: "keycloak.local"

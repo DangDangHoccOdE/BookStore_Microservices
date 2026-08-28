@@ -24,6 +24,10 @@ spec:
         prometheus.io/path: "/actuator/prometheus"
         prometheus.io/port: {{ .Values.notificationService.port | quote }}
     spec:
+      {{- if .Values.global.hostAliases }}
+      hostAliases:
+        {{- toYaml .Values.global.hostAliases | nindent 8 }}
+      {{- end }}
       containers:
         - name: notification-service
           image: "{{ .Values.global.imageRegistry }}/{{ .Values.global.imageUsername }}/bookstore-notification-service:{{ .Values.notificationService.imageTag }}"

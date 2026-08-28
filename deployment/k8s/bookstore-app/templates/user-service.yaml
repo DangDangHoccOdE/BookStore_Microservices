@@ -24,6 +24,10 @@ spec:
         prometheus.io/path: "/actuator/prometheus"
         prometheus.io/port: {{ .Values.userService.port | quote }}
     spec:
+      {{- if .Values.global.hostAliases }}
+      hostAliases:
+        {{- toYaml .Values.global.hostAliases | nindent 8 }}
+      {{- end }}
       containers:
         - name: user-service
           image: "{{ .Values.global.imageRegistry }}/{{ .Values.global.imageUsername }}/bookstore-user-service:{{ .Values.userService.imageTag }}"

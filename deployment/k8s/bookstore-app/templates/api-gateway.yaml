@@ -24,6 +24,10 @@ spec:
         prometheus.io/path: "/actuator/prometheus"
         prometheus.io/port: {{ .Values.apiGateway.port | quote }}
     spec:
+      {{- if .Values.global.hostAliases }}
+      hostAliases:
+        {{- toYaml .Values.global.hostAliases | nindent 8 }}
+      {{- end }}
       containers:
         - name: api-gateway
           image: "{{ .Values.global.imageRegistry }}/{{ .Values.global.imageUsername }}/bookstore-api-gateway:{{ .Values.apiGateway.imageTag }}"
