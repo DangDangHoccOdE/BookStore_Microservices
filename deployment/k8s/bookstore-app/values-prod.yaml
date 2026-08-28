@@ -44,7 +44,7 @@ apiGateway:
 catalogService:
   replicaCount: 1
   port: 8081
-  imageTag: "latest"
+  imageTag: "e5ed893"
   dbUrl: "jdbc:postgresql://postgres:5432/catalog_db"
   resources:
     requests:
