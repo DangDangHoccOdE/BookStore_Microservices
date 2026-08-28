@@ -37,6 +37,7 @@ spec:
               command: ["rabbitmq-diagnostics", "-q", "check_running"]
             initialDelaySeconds: 20
             periodSeconds: 10
+            timeoutSeconds: 10
           volumeMounts:
             - name: rabbitmq-data
               mountPath: /var/lib/rabbitmq
