@@ -47,6 +47,9 @@ spec:
               value: {{ .Values.postgres.password | quote }}
             - name: POSTGRES_MULTIPLE_DATABASES
               value: "catalog_db,orders_db,users_db,notifications_db,analytics_db,,keycloak_db"
+            # Bổ sung thêm biến môi trường PGDATA dưới đây ( để chỉ định thư mục dữ liệu của PostgreSQL)
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           ports:
             - containerPort: 5432
               name: dbport
