@@ -7,7 +7,7 @@ global:
   imagePullPolicy: "Always"
 
   hostAliases:
-    - ip: "34.118.227.230" # IP dịch vụ Keycloak nội bộ trên GKE
+    - ip: "34.118.237.242" # IP Ingress
       hostnames:
         - "keycloak.local"
 
