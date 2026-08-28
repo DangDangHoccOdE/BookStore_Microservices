@@ -12,6 +12,10 @@ spec:
       labels:
         app: keycloak
     spec:
+      volumes:
+        - name: realm-import
+          configMap:
+            name: keycloak-realm-config
       containers:
         - name: keycloak
           image: {{ .Values.keycloak.image }}
@@ -55,6 +59,9 @@ spec:
             limits:
               cpu: 600m
               memory: 1Gi
+          volumeMounts:
+            - name: realm-import
+              mountPath: /opt/keycloak/data/import
           readinessProbe:
             tcpSocket:
               port: 9191

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-realm-config
+  labels:
+    app: keycloak
+data:
+  bookstore-realm.json: |-
+{{ .Files.Get "files/bookstore-realm.json" | indent 4 }}
