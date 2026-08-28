@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
+// Trigger CI build
 @Configuration
 @EnableWebFluxSecurity
 public class GatewaySecurityConfig {

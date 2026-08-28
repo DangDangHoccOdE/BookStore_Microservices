@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+// Trigger CI build
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
