@@ -5,34 +5,28 @@ global:
   apiGatewayUrl: "http://bookstore.local" # Sử dụng HTTP
   ingressClassName: "nginx"
   imagePullPolicy: "Always"
-
   hostAliases:
     - ip: "34.118.237.242" # IP Ingress
       hostnames:
         - "keycloak.local"
-
   # Cấu hình Hostname dùng chung để trỏ file hosts local về IP GKE
   apiGatewayHost: "bookstore.local"
   keycloakHost: "keycloak.local"
-
   # TẮT TLS trên GKE
   tls:
     enabled: false
     secretName: "bookstore-tls-prod-secret"
     certIssuer: ""
-
 tracing:
   enabled: "false"
   zipkinEndpoint: "http://tempo:9411"
-
 lifecycle:
   timeoutPerShutdownPhase: "30s"
   preStopSleepSeconds: 15
-
 apiGateway:
   replicaCount: 1
   port: 8989
-  imageTag: "latest" # Default để "latest" cho GKE, sẽ cập nhật trỏ về biến imageTag riêng của từng service
+  imageTag: "6ec9705" # Default để "latest" cho GKE, sẽ cập nhật trỏ về biến imageTag riêng của từng service
   resources:
     requests:
       cpu: 50m
@@ -101,7 +95,6 @@ userService:
       memory: 1Gi
   autoscaling:
     enabled: false
-
 notificationService:
   replicaCount: 1
   port: 8083
@@ -116,7 +109,6 @@ notificationService:
       memory: 768Mi
   autoscaling:
     enabled: false
-
 analyticsService:
   replicaCount: 1
   port: 8085
@@ -131,7 +123,6 @@ analyticsService:
       memory: 768Mi
   autoscaling:
     enabled: false
-
 secrets:
   databasePassword: "superSecurePassword123"
   keycloakAdminClientSecret: "HqbZthuP7SpE5mxinaMkGURIlrRFj1EC"
