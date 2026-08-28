@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bookstore-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/DangDangHoccOdE/BookStore_Microservices.git'
+    targetRevision: main
+    # Đường dẫn trỏ tới Helm Chart ứng dụng
+    path: deployment/k8s/bookstore-app
+    helm:
+      valueFiles:
+        - values-prod.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: bookstore-prod # Deploy toàn bộ vào namespace này
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    createNamespace: true

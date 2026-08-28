@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1 # API của Argo CD
+kind: Application # Resource này là một Argo CD Application.
+metadata:
+  name: bookstore-infra
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/DangDangHoccOdE/BookStore_Microservices.git'
+    # Argo CD sẽ clone repository này
+    targetRevision: main
+    # Hãy theo dõi revision hiện tại của branch mặc định.
+    path: deployment/k8s/infra-chart
+    # Đường dẫn trỏ tới Helm Chart hạ tầng
+    helm:
+      valueFiles:
+        - values-prod.yaml
+  destination: # Deploy vào cluster nào và namespace nào?
+    server: 'https://kubernetes.default.svc'
+    namespace: bookstore-prod # Deploy toàn bộ vào namespace này
+  syncPolicy:
+    automated:
+      prune: true # Đồng bộ trạng thái các pod gữa cluster và Argo CD, xóa các pod không còn trong repo.
+      selfHeal: true # Tự động đồng bộ trạng thái các pod giữa cluster và Argo CD, nếu có sự khác biệt sẽ tự động đồng bộ lại ( Ví dụ khác nhau về số replica, image tag, configmap, secret, ...)
+    createNamespace: true
