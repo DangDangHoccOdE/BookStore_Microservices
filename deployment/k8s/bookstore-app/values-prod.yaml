@@ -31,7 +31,7 @@ apiGateway:
   resources:
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 256Mi
     limits:
       cpu: 500m
       memory: 1Gi
@@ -50,7 +50,7 @@ catalogService:
   resources:
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 256Mi
     limits:
       cpu: 600m
       memory: 1Gi
@@ -70,7 +70,7 @@ orderService:
   resources:
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 256Mi
     limits:
       cpu: 600m
       memory: 1Gi
@@ -90,7 +90,7 @@ userService:
   resources:
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 256Mi
     limits:
       cpu: 500m
       memory: 1Gi
