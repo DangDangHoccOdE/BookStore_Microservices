@@ -108,7 +108,7 @@ notificationService:
       memory: 256Mi
     limits:
       cpu: 400m
-      memory: 512Mi
+      memory: 768Mi
   autoscaling:
     enabled: false
 
@@ -123,7 +123,7 @@ analyticsService:
       memory: 256Mi
     limits:
       cpu: 400m
-      memory: 512Mi
+      memory: 768Mi
   autoscaling:
     enabled: false
 
