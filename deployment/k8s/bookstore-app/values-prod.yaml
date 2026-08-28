@@ -63,7 +63,7 @@ catalogService:
 orderService:
   replicaCount: 1
   port: 8082
-  imageTag: "latest"
+  imageTag: "e5ed893"
   dbUrl: "jdbc:postgresql://postgres:5432/orders_db"
   catalogServiceUrl: "http://catalog-service:8081"
   resources:
