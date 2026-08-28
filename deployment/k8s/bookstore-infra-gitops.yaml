@@ -22,4 +22,5 @@ spec:
     automated:
       prune: true # Đồng bộ trạng thái các pod gữa cluster và Argo CD, xóa các pod không còn trong repo.
       selfHeal: true # Tự động đồng bộ trạng thái các pod giữa cluster và Argo CD, nếu có sự khác biệt sẽ tự động đồng bộ lại ( Ví dụ khác nhau về số replica, image tag, configmap, secret, ...)
-    createNamespace: true
+    syncOptions:
+      - CreateNamespace=true # Tự động tạo namespace nếu chưa tồn tại.
