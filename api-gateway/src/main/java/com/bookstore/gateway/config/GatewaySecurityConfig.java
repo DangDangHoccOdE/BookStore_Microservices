@@ -23,7 +23,7 @@ public class GatewaySecurityConfig {
         return http.securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(ex -> ex.pathMatchers(
-                                "/actuator/health",
+                                "/actuator/health/**",
                                 "/actuator/prometheus",
                                 "/actuator/info",
                                 "/v3/api-docs/**",
