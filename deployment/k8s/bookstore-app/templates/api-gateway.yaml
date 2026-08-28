@@ -26,7 +26,9 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: "{{ .Values.global.imageRegistry }}/{{ .Values.global.imageUsername }}/bookstore-api-gateway:{{ .Values.global.imageTag }}"
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.global.imageUsername }}/bookstore-api-gateway:{{ .Values.apiGateway.imageTag }}"
+          # Sẽ ghi đè vào giá trị latest khai báo trong values.
+          # Sử dụng chuẩn đên từng commit SHA để đảm bảo tính nhất quán của image khi triển khai trên GKE của từng service
           imagePullPolicy: {{ .Values.global.imagePullPolicy | default "Always" }}
           ports:
             - containerPort: {{ .Values.apiGateway.port }}

@@ -1,7 +1,6 @@
 global:
   imageRegistry: "docker.io"
   imageUsername: "danghoang9704"
-  imageTag: "" # Sẽ tự động lấy từ lệnh helm --set qua Git SHA
   keycloakIssuer: "https://keycloak.local/realms/bookstore"
   apiGatewayUrl: "https://bookstore.local"
   ingressClassName: "nginx"
@@ -27,6 +26,7 @@ lifecycle:
 apiGateway:
   replicaCount: 2
   port: 8989
+  imageTag: "latest"
   resources:
     requests:
       cpu: 200m
@@ -43,6 +43,7 @@ apiGateway:
 catalogService:
   replicaCount: 2
   port: 8081
+  imageTag: "latest"
   dbUrl: "jdbc:postgresql://postgres:5432/catalog_db"
   resources:
     requests:
@@ -60,6 +61,7 @@ catalogService:
 orderService:
   replicaCount: 2
   port: 8082
+  imageTag: "latest"
   dbUrl: "jdbc:postgresql://postgres:5432/orders_db"
   catalogServiceUrl: "http://catalog-service:8081"
   resources:
@@ -78,6 +80,7 @@ orderService:
 userService:
   replicaCount: 2
   port: 8084
+  imageTag: "latest"
   dbUrl: "jdbc:postgresql://postgres:5432/users_db"
   keycloakServerUrl: "http://keycloak:9191"
   resources:
@@ -93,6 +96,7 @@ userService:
 notificationService:
   replicaCount: 1
   port: 8083
+  imageTag: "latest"
   dbUrl: "jdbc:postgresql://postgres:5432/notifications_db"
   resources:
     requests:
@@ -107,6 +111,7 @@ notificationService:
 analyticsService:
   replicaCount: 1
   port: 8085
+  imageTag: "latest"
   dbUrl: "jdbc:postgresql://postgres:5432/analytics_db"
   resources:
     requests:

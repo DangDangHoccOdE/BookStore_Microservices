@@ -1,10 +1,11 @@
+{{- if .Values.global.tls.enabled }}
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: bookstore-selfsigned-issuer
 spec:
   selfSigned: {} # Ra lệnh cho cert-manager tự tạo chứng chỉ không cần internet
-
+{{- end }}
 # Cách thức hoạt động lúc này: Khi bạn chạy Helm cài đặt,
 # Cert-Manager thấy cấu hình bookstore-selfsigned-issuer,
 # nó sẽ tự động ký một chứng chỉ mã hóa cho bookstore.local và keycloak.local,

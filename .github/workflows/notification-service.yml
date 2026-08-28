@@ -49,4 +49,20 @@ jobs:
           ./mvnw spring-boot:build-image -DskipTests -DdockerImageTag=${{ env.IMAGE_TAG }}
           docker tag ${{ env.DOCKER_IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.DOCKER_IMAGE_NAME }}:latest
           docker push ${{ env.DOCKER_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          docker push ${{ env.DOCKER_IMAGE_NAME }}:latest          
+          docker push ${{ env.DOCKER_IMAGE_NAME }}:latest 
+
+      - if: ${{ github.ref == 'refs/heads/main' }}
+        name: Update Image Tag in Git & Push (GitOps Flow)
+        run: |
+          # Cài đặt cấu hình Git Bot
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # Dùng yq để ghi đè giá trị imageTag của riêng notificationService trong file values-prod.yaml
+          yq -i '.notificationService.imageTag = "${{ env.IMAGE_TAG }}"' deployment/k8s/bookstore-app/values-prod.yaml
+          
+          # Commit và Push thay đổi lên Git ( Vì argoCD chỉ theo doi file values-prod.yaml nên chỉ cần commit file này )
+          git add deployment/k8s/bookstore-app/values-prod.yaml
+          git commit -m "image(gitops): update notification-service image tag to ${{ env.IMAGE_TAG }} [skip ci]"
+          git push          
+

@@ -11,7 +11,7 @@ redis:
 
 rabbitmq:
   enabled: true
-  image: rabbitmq:3-12-management
+  image: rabbitmq:3.12-management
   user: prodAdminRabbit
   pass: prodSecretPassRabbit999
   storageSize: 5Gi

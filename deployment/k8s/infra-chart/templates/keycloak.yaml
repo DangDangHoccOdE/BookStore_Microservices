@@ -39,14 +39,14 @@ spec:
               value: "edge"
           # Biến cấu hình DB khi chạy Production
           {{- if eq .Values.keycloak.mode "prod" }}
-          - name: KC_DB
-            value: "postgres"
-          - name: KC_DB_URL
-            value: "jdbc:postgresql://{{ .Values.keycloak.prodDb.host }}:{{ .Values.keycloak.prodDb.port }}/{{ .Values.keycloak.prodDb.name }}"
-          - name: KC_DB_USERNAME
-            value: {{ .Values.keycloak.prodDb.user | quote }}
-          - name: KC_DB_PASSWORD
-            value: {{ .Values.keycloak.prodDb.password | quote }}
+            - name: KC_DB
+              value: "postgres"
+            - name: KC_DB_URL
+              value: "jdbc:postgresql://{{ .Values.keycloak.prodDb.host }}:{{ .Values.keycloak.prodDb.port }}/{{ .Values.keycloak.prodDb.name }}"
+            - name: KC_DB_USERNAME
+              value: {{ .Values.keycloak.prodDb.user | quote }}
+            - name: KC_DB_PASSWORD
+              value: {{ .Values.keycloak.prodDb.password | quote }}
           {{- end }}
           resources:
             requests:

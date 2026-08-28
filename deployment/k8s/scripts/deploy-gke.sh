@@ -3,13 +3,13 @@ set -e
 
 # Khai báo cấu hình dự án
 PROJECT_ID="fluent-observer-457907-r7" # Hãy thay bằng Project ID thực tế của bạn
-REGION="asia-southeast1"
+ZONE="asia-southeast1-a"
 CLUSTER_NAME="bookstore-cluster"
 NAMESPACE="bookstore-prod"
 
 echo "Configuring GCP Project & GKE Context..."
 gcloud config set project $PROJECT_ID
-gcloud container clusters get-credentials $CLUSTER_NAME --region $REGION
+gcloud container clusters get-credentials $CLUSTER_NAME --zone $ZONE
 
 echo "Creating Namespace: $NAMESPACE..."
 kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -

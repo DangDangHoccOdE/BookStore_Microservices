@@ -1,7 +1,6 @@
 global:
   imageRegistry: "docker.io"
   imageUsername: "danghoang9704"
-  imageTag: "" # Sẽ inject qua deploy script
   keycloakIssuer: "http://keycloak.local/realms/bookstore" # Sử dụng HTTP
   apiGatewayUrl: "http://bookstore.local" # Sử dụng HTTP
   ingressClassName: "nginx"
@@ -26,64 +25,71 @@ lifecycle:
   preStopSleepSeconds: 15
 
 apiGateway:
-  replicaCount: 2
+  replicaCount: 1
   port: 8989
+  imageTag: "latest" # Default để "latest" cho GKE, sẽ cập nhật trỏ về biến imageTag riêng của từng service
   resources:
     requests:
-      cpu: 200m
+      cpu: 100m
       memory: 512Mi
     limits:
       cpu: 500m
       memory: 1Gi
   autoscaling:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 5
-    targetCPUUtilizationPercentage: 70
+    enabled: false
+#    enabled: true
+#    minReplicas: 2
+#    maxReplicas: 5
+#    targetCPUUtilizationPercentage: 70
 
 catalogService:
-  replicaCount: 2
+  replicaCount: 1
   port: 8081
+  imageTag: "latest"
   dbUrl: "jdbc:postgresql://postgres:5432/catalog_db"
   resources:
     requests:
-      cpu: 200m
+      cpu: 100m
       memory: 512Mi
     limits:
       cpu: 600m
       memory: 1Gi
   autoscaling:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 5
-    targetCPUUtilizationPercentage: 70
+    enabled: false
+#    enabled: true
+#    minReplicas: 2
+#    maxReplicas: 5
+#    targetCPUUtilizationPercentage: 70
 
 orderService:
-  replicaCount: 2
+  replicaCount: 1
   port: 8082
+  imageTag: "latest"
   dbUrl: "jdbc:postgresql://postgres:5432/orders_db"
   catalogServiceUrl: "http://catalog-service:8081"
   resources:
     requests:
-      cpu: 250m
+      cpu: 100m
       memory: 512Mi
     limits:
       cpu: 600m
       memory: 1Gi
   autoscaling:
-    enabled: true
-    minReplicas: 2
-    maxReplicas: 5
-    targetCPUUtilizationPercentage: 70
+    enabled: false
+#    enabled: true
+#    minReplicas: 2
+#    maxReplicas: 5
+#    targetCPUUtilizationPercentage: 70
 
 userService:
-  replicaCount: 2
+  replicaCount: 1
   port: 8084
+  imageTag: "latest"
   dbUrl: "jdbc:postgresql://postgres:5432/users_db"
   keycloakServerUrl: "http://keycloak:9191"
   resources:
     requests:
-      cpu: 200m
+      cpu: 100m
       memory: 512Mi
     limits:
       cpu: 500m
@@ -94,10 +100,11 @@ userService:
 notificationService:
   replicaCount: 1
   port: 8083
+  imageTag: "latest"
   dbUrl: "jdbc:postgresql://postgres:5432/notifications_db"
   resources:
     requests:
-      cpu: 150m
+      cpu: 100m
       memory: 256Mi
     limits:
       cpu: 400m
@@ -108,10 +115,11 @@ notificationService:
 analyticsService:
   replicaCount: 1
   port: 8085
+  imageTag: "latest"
   dbUrl: "jdbc:postgresql://postgres:5432/analytics_db"
   resources:
     requests:
-      cpu: 150m
+      cpu: 100m
       memory: 256Mi
     limits:
       cpu: 400m
