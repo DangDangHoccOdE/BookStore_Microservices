@@ -26,10 +26,11 @@ Hệ thống gồm nhiều service nhỏ, mỗi service phụ trách một chứ
 | Service              | Chức năng                   |
 | -------------------- | --------------------------- |
 | API Gateway          | Cổng vào chung của hệ thống |
-| Catalog Service      | Quản lý sách                |
+| Catalog Service      | Quản lý danh mục sách       |
 | Order Service        | Quản lý đơn hàng            |
 | User Service         | Quản lý người dùng          |
 | Notification Service | Gửi email thông báo         |
+| Analytics Service    | Phân tích và thống kê số liệu|
 
 ---
 
@@ -91,11 +92,14 @@ Gửi email thông báo
 * Loki
 * Tempo
 
-## DevOps
+## DevOps & GitOps
 
-* Docker
-* Docker Compose
-* GitHub Actions
+* Docker & Docker Compose (Chạy thử nghiệm Local)
+* Kubernetes & Helm (Đóng gói ứng dụng)
+* Google Kubernetes Engine (GKE - Triển khai Production)
+* Nginx Ingress Controller (Định tuyến traffic LoadBalancer)
+* ArgoCD (Công cụ GitOps tự động đồng bộ)
+* GitHub Actions (CI/CD Pipeline tự động build, test và push image)
 
 ---
 
@@ -172,6 +176,7 @@ Mỗi service có database riêng:
 | Order Service        | orders-db        |
 | User Service         | users-db         |
 | Notification Service | notifications-db |
+| Analytics Service    | analytics-db     |
 
 ---
 
@@ -433,6 +438,7 @@ task stop
 
 # 🌐 Các URL quan trọng
 
+### Môi trường Local (Docker Compose)
 | Service     | URL                                   |
 | ----------- | ------------------------------------- |
 | API Gateway | http://localhost:8989                 |
@@ -441,22 +447,43 @@ task stop
 | Grafana     | http://localhost:3000                 |
 | Keycloak    | http://localhost:9191                 |
 
+### Môi trường Production (GKE & Ingress)
+| Service          | URL                                       |
+| ---------------- | ----------------------------------------- |
+| Web Application  | http://bookstore.local                    |
+| Keycloak Admin   | http://keycloak.local                     |
+| ArgoCD Web UI    | https://localhost:8080 (Sau khi Port-Forward) |
+
+---
+
+# ☸️ Triển khai Production với GitOps (ArgoCD & GKE)
+
+Dự án hỗ trợ triển khai chuẩn doanh nghiệp sử dụng **GitOps** trên Google Kubernetes Engine (GKE):
+* **Hạ tầng khai báo:** Toàn bộ Postgres, Redis, RabbitMQ, Kafka, Keycloak được định nghĩa dạng Helm Chart tại `deployment/k8s/infra-chart`.
+* **Microservices ứng dụng:** Được định nghĩa tại `deployment/k8s/bookstore-app`.
+* **Đồng bộ tự động (ArgoCD):** Cấu hình GitOps Application nằm tại các file `deployment/k8s/bookstore-infra-gitops.yaml` và `deployment/k8s/bookstore-app-gitops.yaml`.
+* **CI/CD Tự động hóa:** Tích hợp GitHub Actions tự động kiểm thử, đóng gói Docker Image, push Docker Hub và ghi đè cập nhật imageTag mới lên file `values-prod.yaml` trên Git.
+
+> **Tài liệu hướng dẫn chi tiết:**
+> * Hướng dẫn triển khai GKE từng bước: [gke-deployment-guide.md](file:///deployment/k8s/scripts/gke-deployment-guide.md)
+> * Cẩm nang xử lý lỗi và kiến trúc chi tiết (Phục vụ ôn phỏng vấn): [gitops-gke-deployment-handbook.md](file:///deployment/k8s/docs/gitops-gke-deployment-handbook.md)
+
 ---
 
 # 📚 Các kiến thức học được
 
 Project này giúp học:
 
-* Microservices Architecture
-* API Gateway Pattern
-* OAuth2 JWT Authentication
-* RabbitMQ Messaging
+* Microservices Architecture & API Gateway Pattern
+* OAuth2 JWT Authentication (Keycloak)
+* RabbitMQ Messaging (Retry Queue, DLQ)
 * Event-Driven Architecture
-* Docker & Docker Compose
-* Monitoring & Logging
-* CI/CD Pipeline
-* Distributed Tracing
-* Resilience4J
+* Docker & Docker Compose (Local Dev)
+* Kubernetes, Helm, Ingress Nginx (Production Packaging)
+* GitOps & ArgoCD (Reconciliation Loop, Self-Healing)
+* CI/CD Pipelines (GitHub Actions automation)
+* Monitoring & Distributed Tracing (Grafana, Prometheus, Loki, Tempo)
+* Resilience4J (Circuit Breaker, Rate Limiter)
 
 ---
 
@@ -470,7 +497,14 @@ BookStore_Microservices
 ├── order-service
 ├── user-service
 ├── notification-service
+├── analytics-service
 ├── deployment
+│   ├── docker-compose
+│   └── k8s
+│       ├── bookstore-app (Helm Chart microservices)
+│       ├── infra-chart (Helm Chart databases/infrastructure)
+│       ├── scripts (Deployment scripts & GKE guides)
+│       └── docs (DevOps & GitOps Handbook)
 └── docker-compose
 ```
 
