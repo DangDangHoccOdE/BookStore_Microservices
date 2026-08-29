@@ -12,9 +12,11 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: gitops-values-prod-update
-  cancel-in-progress: false
+# Không dùng nữa vì concurrency group chỉ giữ được 1 job running và 1 job queued,
+# nếu có nhiều job queued thì sẽ bị cancel hết, dẫn đến việc không update được image tag trong values-prod.yaml
+#concurrency:
+#  group: gitops-values-prod-update
+#  cancel-in-progress: false
 
 jobs:
   build:
