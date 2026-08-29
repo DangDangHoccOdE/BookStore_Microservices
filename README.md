@@ -466,7 +466,6 @@ Dự án hỗ trợ triển khai chuẩn doanh nghiệp sử dụng **GitOps** t
 
 > **Tài liệu hướng dẫn chi tiết:**
 > * Hướng dẫn triển khai GKE từng bước: [gke-deployment-guide.md](file:///deployment/k8s/scripts/gke-deployment-guide.md)
-> * Cẩm nang xử lý lỗi và kiến trúc chi tiết (Phục vụ ôn phỏng vấn): [gitops-gke-deployment-handbook.md](file:///deployment/k8s/docs/gitops-gke-deployment-handbook.md)
 
 ---
 
